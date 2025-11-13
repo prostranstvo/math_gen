@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Math Practice Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            color: #1f2937;
+            padding: 20px;
+            margin: 0;
+        }
+        /* Default container styles (for the control panel/home view) */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            min-height: 200px;
+        }
+        /* Worksheet View: Removes web container styling for a clean print background */
+        .worksheet-view {
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            max-width: 8.5in; /* Standard paper width */
+            background-color: transparent !important;
+        }
+        .problem-item {
+            padding: 8px 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+
+        /* Style for printing (ensures background colors are disabled by default) */
+        @media print {
+            body {
+                padding: 0;
+            }
+            .no-print { display: none !important; }
+            .container { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; }
+            .worksheet-view .problem-item { border-bottom: 1px dashed #333333; }
+        }
+    </style>
+</head>
+<body onload="showControlPanel()">
+    <div id="app" class="container">
+
+        <!-- 1. Control Panel View (Shown initially, hidden after generating) -->
+        <div id="control-panel">
+            <header class="mb-12 pb-4 border-b-2">
+                <h1 class="text-4xl font-extrabold text-gray-800 text-center">Math Worksheet Generator</h1>
+                <p class="text-center text-gray-500 mt-2">Generate a unique, print-ready practice sheet.</p>
+            </header>
+            
+            <div class="flex justify-center mb-8">
+                <button onclick="generateWorksheet()" 
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-8 text-lg rounded-xl shadow-2xl 
+                               transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-300">
+                    Generate New Worksheet
+                </button>
+            </div>
+        </div>
+        
+        <!-- 2. Worksheet Output Area (Hidden initially, shown after generating) -->
+        <div id="worksheet-output" class="hidden">
+            <!-- Content will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        // Utility function to get a random integer in a range
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // --- Problem Generation Logic (Unchanged from previous version) ---
+
+        function generateAlgebraProblem() {
+            let type = getRandomInt(1, 2);
+            let x, a, b, c;
+            if (type === 1) { 
+                x = getRandomInt(6, 15);
+                a = getRandomInt(2, 5);
+                b = getRandomInt(3, 15);
+                if (Math.random() < 0.5) {
+                    c = (a * x) + b;
+                    return `${a}x + ${b} = ${c}`;
+                } else {
+                    c = (a * x) - b;
+                    return `${a}x - ${b} = ${c}`;
+                }
+            } else { 
+                let solution = getRandomInt(30, 80);
+                a = getRandomInt(4, 9);
+                b = getRandomInt(5, 12);
+                x = solution * a;
+                
+                if (Math.random() < 0.5) {
+                    c = solution + b;
+                    return `x/${a} + ${b} = ${c}`;
+                } else {
+                    c = solution - b;
+                    if (c <= 0) { c = 1; b = solution - 1; }
+                    return `x/${a} - ${b} = ${c}`;
+                }
+            }
+        }
+
+        function generateDivisionProblem() {
+            const B = getRandomInt(6, 25);
+            const C = getRandomInt(30, 100);
+            const A = B * C;
+            return `${A} ÷ ${B} = ___`;
+        }
+
+        function generateMultiplicationProblem() {
+            const A = getRandomInt(20, 99);
+            const B = getRandomInt(6, 49);
+            return `${A} × ${B} = ___`;
+        }
+
+        function generateWordProblem(index) {
+            const problemType = index % 5;
+            let p1, p2, unit, question;
+
+            switch (problemType) {
+                case 0:
+                    p1 = getRandomInt(10, 25);
+                    p2 = getRandomInt(5, 15);
+                    unit = p1 > 20 ? 'boxes' : 'bags';
+                    question = `A store received ${p1} ${unit} of toys. If each ${unit.slice(0, -1)} holds ${p2} toys, how many toys are there in total?`;
+                    break;
+                case 1:
+                    p1 = getRandomInt(300, 700);
+                    p2 = getRandomInt(5, 12);
+                    unit = p2 > 10 ? 'hours' : 'minutes';
+                    question = `A cyclist travels ${p1} kilometers in ${p2} ${unit}. What is the average distance traveled per unit of time?`;
+                    break;
+                case 2:
+                    p1 = getRandomInt(200, 500);
+                    p2 = getRandomInt(50, 150);
+                    question = `Lisa had $${p1}. She spent $${p2} on groceries and supplies. How much money does she have left?`;
+                    break;
+                case 3:
+                    p1 = getRandomInt(100, 250);
+                    p2 = getRandomInt(8, 15);
+                    unit = p1 > 200 ? 'pieces of fruit' : 'cookies';
+                    question = `A baker made ${p1} ${unit}. If he packs them into bags of ${p2}, how many full bags can he make?`;
+                    break;
+                case 4:
+                    p1 = getRandomInt(25, 60);
+                    p2 = getRandomInt(4, 9);
+                    question = `A construction crew lays ${p1} meters of pipe each day. How many meters of pipe will they lay in ${p2} days?`;
+                    break;
+            }
+            return question;
+        }
+
+        function generateWorksheetContent() {
+            let problems = {
+                algebra: Array.from({ length: 5 }, () => generateAlgebraProblem()),
+                division: Array.from({ length: 5 }, () => generateDivisionProblem()),
+                multiplication: Array.from({ length: 5 }, () => generateMultiplicationProblem()),
+                word: Array.from({ length: 5 }, (_, i) => generateWordProblem(i)),
+            };
+
+            const renderSection = (title, problems, color, bgColor) => `
+                <section class="section p-4 ${bgColor} rounded-lg shadow-sm mb-6 print-only-bg">
+                    <h2 class="text-xl font-semibold ${color} mb-3">${title}</h2>
+                    <ul class="space-y-3 list-decimal list-inside">
+                        ${problems.map(p => `<li class="problem-item text-gray-700">${p}</li>`).join('')}
+                    </ul>
+                </section>
+            `;
+
+            return `
+                <header class="mb-8 border-b-2 pb-4">
+                    <h1 class="text-3xl font-bold text-indigo-600">Math Practice Worksheet</h1>
+                    <p class="text-gray-500 mt-1">Date: __________________________</p>
+                </header>
+                <main class="space-y-8">
+                    ${renderSection("Section A: Solve for x (Algebra)", problems.algebra, "text-indigo-700", "bg-indigo-50")}
+                    ${renderSection("Section B: Long Division", problems.division, "text-teal-700", "bg-teal-50")}
+                    ${renderSection("Section C: Multiplication", problems.multiplication, "text-orange-700", "bg-orange-50")}
+                    ${renderSection("Section D: Word Problems", problems.word, "text-pink-700", "bg-pink-50")}
+                </main>
+            `;
+        }
+        
+        // --- View Control Functions ---
+        
+        function generateWorksheet() {
+            const appContainer = document.getElementById('app');
+            const controlPanel = document.getElementById('control-panel');
+            const worksheetContainer = document.getElementById('worksheet-output');
+
+            // 1. Hide the control panel
+            controlPanel.classList.add('hidden');
+            
+            // 2. Remove the container styling for print-readiness
+            appContainer.classList.add('worksheet-view');
+
+            // 3. Show the output area and generate content
+            worksheetContainer.classList.remove('hidden');
+            worksheetContainer.innerHTML = generateWorksheetContent();
+        }
+
+        function showControlPanel() {
+            // Placeholder function called on body load to ensure the control panel is visible initially
+            const controlPanel = document.getElementById('control-panel');
+            controlPanel.classList.remove('hidden');
+        }
+
+    </script>
+</body>
+</html>

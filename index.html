@@ -9,7 +9,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f7f7f7;
+            /* Changed main background to plain white */
+            background-color: white;
             color: #1f2937;
             padding: 20px;
             margin: 0;
@@ -37,13 +38,19 @@
             border-bottom: 1px dashed #e5e7eb;
         }
 
-        /* Style for printing (ensures background colors are disabled by default) */
+        /* Style for printing (forces white backgrounds for ink saving) */
         @media print {
             body {
                 padding: 0;
             }
             .no-print { display: none !important; }
             .container { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; }
+            
+            /* Crucial: Override section backgrounds to white when printing */
+            .section {
+                background-color: white !important; 
+                box-shadow: none !important;
+            }
             .worksheet-view .problem-item { border-bottom: 1px dashed #333333; }
         }
     </style>
@@ -170,8 +177,9 @@
                 word: Array.from({ length: 5 }, (_, i) => generateWordProblem(i)),
             };
 
+            // Removed 'print-only-bg' class as styling is now controlled by CSS @media print block
             const renderSection = (title, problems, color, bgColor) => `
-                <section class="section p-4 ${bgColor} rounded-lg shadow-sm mb-6 print-only-bg">
+                <section class="section p-4 ${bgColor} rounded-lg shadow-sm mb-6">
                     <h2 class="text-xl font-semibold ${color} mb-3">${title}</h2>
                     <ul class="space-y-3 list-decimal list-inside">
                         ${problems.map(p => `<li class="problem-item text-gray-700">${p}</li>`).join('')}

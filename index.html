@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Math Practice Generator</title>
+    <title>Classroom Homework Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            /* Changed main background to plain white */
             background-color: white;
             color: #1f2937;
             padding: 20px;
             margin: 0;
         }
-        /* Default container styles (for the control panel/home view) */
+        /* Default container styles */
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -25,206 +24,304 @@
             border-radius: 12px;
             min-height: 200px;
         }
-        /* Worksheet View: Removes web container styling for a clean print background */
+        /* Worksheet View: Clean for printing */
         .worksheet-view {
             box-shadow: none !important;
             padding: 0 !important;
             margin: 0 auto !important;
-            max-width: 8.5in; /* Standard paper width */
+            max-width: 8.5in;
             background-color: transparent !important;
         }
         .problem-item {
             padding: 8px 0;
             border-bottom: 1px dashed #e5e7eb;
         }
+        .section-box {
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .writing-lines {
+            line-height: 2.5em;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 100% 2.5em;
+            height: 150px;
+            width: 100%;
+            margin-top: 10px;
+        }
 
-        /* Style for printing (forces white backgrounds for ink saving) */
+        /* Print Styles */
         @media print {
-            body {
-                padding: 0;
-            }
+            body { padding: 0; }
             .no-print { display: none !important; }
-            .container { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; }
+            .container { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
             
-            /* Crucial: Override section backgrounds to white when printing */
-            .section {
+            /* Force white backgrounds */
+            .section, .section-box {
                 background-color: white !important; 
                 box-shadow: none !important;
+                border: 1px solid #ccc !important;
             }
-            .worksheet-view .problem-item { border-bottom: 1px dashed #333333; }
+            .problem-item { border-bottom: 1px dashed #333; }
+            .writing-lines { background-image: linear-gradient(#999 1px, transparent 1px); }
+            
+            .page-break { page-break-before: always; }
         }
     </style>
 </head>
 <body onload="showControlPanel()">
     <div id="app" class="container">
 
-        <!-- 1. Control Panel View (Shown initially, hidden after generating) -->
+        <!-- 1. Control Panel View -->
         <div id="control-panel">
-            <header class="mb-12 pb-4 border-b-2">
-                <h1 class="text-4xl font-extrabold text-gray-800 text-center">Math Worksheet Generator</h1>
-                <p class="text-center text-gray-500 mt-2">Generate a unique, print-ready practice sheet.</p>
+            <header class="mb-10 border-b-2 pb-6">
+                <h1 class="text-4xl font-extrabold text-gray-800 text-center">Classroom Homework Generator</h1>
+                <p class="text-center text-gray-500 mt-2">Select a tool to generate a print-ready worksheet.</p>
             </header>
             
-            <div class="flex justify-center mb-8">
-                <button onclick="generateWorksheet()" 
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-8 text-lg rounded-xl shadow-2xl 
-                               transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-300">
-                    Generate New Worksheet
-                </button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                <!-- Standard Math Button -->
+                <div class="text-center p-6 border-2 border-dashed border-indigo-200 rounded-xl hover:border-indigo-500 transition cursor-pointer bg-indigo-50" onclick="generateMathWorksheet()">
+                    <h2 class="text-2xl font-bold text-indigo-700 mb-2">Math Practice</h2>
+                    <p class="text-sm text-gray-600 mb-4">General algebra, division, multiplication & word problems.</p>
+                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
+                        Generate Math Sheet
+                    </button>
+                </div>
+
+                <!-- Swansea Weekly Button -->
+                <div class="text-center p-6 border-2 border-dashed border-teal-200 rounded-xl hover:border-teal-500 transition cursor-pointer bg-teal-50">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-2">Swansea Weekly Tasks</h2>
+                    <p class="text-sm text-gray-600 mb-4">Curriculum-aligned tasks based on Weekly Updates.</p>
+                    
+                    <div class="flex flex-col space-y-2">
+                        <select id="week-selector" class="p-2 border rounded text-gray-700 mb-2">
+                            <option value="2">Week 2 (Oct 10) - Patterning & Letter Writing</option>
+                            <option value="3">Week 3 (Oct 17) - Add/Sub & Inferences</option>
+                            <option value="4">Week 4 (Oct 24) - Subtraction & Suffix -ed</option>
+                            <option value="5">Week 5 (Oct 31) - Persuasive & Measurement</option>
+                            <option value="6">Week 6 (Nov 7) - Capacity & Suffix -ly</option>
+                            <option value="7">Week 7 (Nov 14) - Multi/Div & Narrative</option>
+                            <option value="8" selected>Week 8 (Nov 21) - 2-Digit Multi & Citizenship</option>
+                        </select>
+                        <button onclick="generateSwanseaWorksheet()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
+                            Generate Weekly Task
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- 2. Worksheet Output Area (Hidden initially, shown after generating) -->
+        <!-- 2. Worksheet Output Area -->
         <div id="worksheet-output" class="hidden">
             <!-- Content will be generated here -->
         </div>
     </div>
 
     <script>
-        // Utility function to get a random integer in a range
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+        // ==========================================
+        // DATA: Swansea Curriculum
+        // ==========================================
+        const swanseaData = {
+            2: { date: "October 10, 2025", spelling: ["review", "rebuild", "replace", "reconsider", "restore", "thought", "theme", "thunder", "thousand", "theory", "whisper", "whistle", "whimsical", "while", "whirlwind"], grammar: "Prefix 're-' and digraphs 'th', 'wh'.", writing_topic: "Letter Writing (Formal vs Informal)", math_topic: "Patterning", science_topic: "Circulatory System" },
+            3: { date: "October 17, 2025", spelling: ["Reading", "Building", "Creating", "Understanding", "Communicating", "Breathe", "Reason", "Speaker", "Release", "Appeal", "Indeed", "Succeed", "Squeeze", "Foresee", "Guarantee"], grammar: "Suffix '-ing', digraphs 'ea', 'ee'.", writing_topic: "Letter Writing (Revising & Drafting)", math_topic: "Estimation (Add/Sub)", science_topic: "Circulatory System (Diseases)" },
+            4: { date: "October 24, 2025", spelling: ["studied", "created", "explored", "watched", "explained", "cherish", "vanish", "cushion", "marsh", "fashion", "alphabet", "dolphin", "hemisphere", "philosophy", "phantom"], grammar: "Suffix '-ed', blends 'sh', 'ph'. Fixing run-on sentences.", writing_topic: "Letter Writing (Final Letter)", math_topic: "Subtraction Strategies", science_topic: "Musculoskeletal System" },
+            5: { date: "October 31, 2025", spelling: ["Disagree", "Disobey", "Disregard", "Disband", "Disconnect", "Choice", "Rejoice", "Poison", "Turmoil", "Noise", "Doubt", "Shout", "Mountain", "Encounter", "Announce"], grammar: "Prefix 'dis-', blends 'oi', 'ou'. Compound sentences.", writing_topic: "Persuasive Writing", math_topic: "Measurement (Volume/Mass)", science_topic: "Musculoskeletal System" },
+            6: { date: "November 7, 2025", spelling: ["quickly", "softly", "honestly", "eventually", "rapidly", "brain", "available", "complain", "detail", "failure", "display", "birthday", "portray", "always", "betray"], grammar: "Suffix '-ly', digraphs 'ai', 'ay'. Advanced conjunctions.", writing_topic: "Persuasive Writing (Bias)", math_topic: "Metric Conversions", science_topic: "Digestive System" },
+            7: { date: "November 14, 2025", spelling: ["precaution", "preview", "predetermine", "prearrange", "prepay", "thriller", "thrifty", "through", "throat", "throne", "splash", "splurge", "splatter", "splinter", "split"], grammar: "Prefix 'pre-', blends 'thr', 'spl'. Subordinating conjunctions.", writing_topic: "Narrative Writing (Setting)", math_topic: "Multiplication (9x9)", science_topic: "Digestive System" },
+            8: { date: "November 21, 2025", spelling: ["happiness", "kindness", "willingness", "loneliness", "forgiveness", "drool", "smooth", "rookie", "scooter", "kangaroo", "withdraw", "awesome", "awkward", "sprawl", "brawny"], grammar: "Suffix '-ness', vowel 'oo', 'aw'. Connecting words: because, although, if.", writing_topic: "Narrative Writing (Setting & Mood)", math_topic: "2-Digit Multiplication (Area Model)", science_topic: "Citizenship & Rights" }
+        };
 
-        // --- Problem Generation Logic (Unchanged from previous version) ---
+        // ==========================================
+        // LOGIC: Generators
+        // ==========================================
+        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-        function generateAlgebraProblem() {
-            let type = getRandomInt(1, 2);
-            let x, a, b, c;
-            if (type === 1) { 
-                x = getRandomInt(6, 15);
-                a = getRandomInt(2, 5);
-                b = getRandomInt(3, 15);
-                if (Math.random() < 0.5) {
-                    c = (a * x) + b;
-                    return `${a}x + ${b} = ${c}`;
-                } else {
-                    c = (a * x) - b;
-                    return `${a}x - ${b} = ${c}`;
-                }
-            } else { 
-                let solution = getRandomInt(30, 80);
-                a = getRandomInt(4, 9);
-                b = getRandomInt(5, 12);
-                x = solution * a;
-                
-                if (Math.random() < 0.5) {
-                    c = solution + b;
-                    return `x/${a} + ${b} = ${c}`;
-                } else {
-                    c = solution - b;
-                    if (c <= 0) { c = 1; b = solution - 1; }
-                    return `x/${a} - ${b} = ${c}`;
+        function renderMathSection(title, count, type) {
+            let problems = [];
+            
+            // Generate problems based on type
+            for(let i=0; i<count; i++) {
+                if(type === 'algebra') {
+                     let a = getRandomInt(2,9), x = getRandomInt(2,10), b = getRandomInt(1,10);
+                     problems.push(`${a}x + ${b} = ${a*x+b}`);
+                } else if (type === 'division') {
+                    let b = getRandomInt(3,12), c = getRandomInt(5,20);
+                    problems.push(`${b*c} &div; ${b} = ___`);
+                } else if (type === 'multiplication') {
+                    problems.push(`${getRandomInt(10,99)} &times; ${getRandomInt(2,9)} = ___`);
+                } else if (type === 'word') {
+                    problems = [
+                        "A box holds 12 pencils. How many pencils in 8 boxes?",
+                        "Tom runs 5km a day. How far in a week?",
+                        "Share 48 cookies among 6 kids.",
+                        "Book cost $15. You have $50. Change?",
+                        "3 hours = how many minutes?"
+                    ];
                 }
             }
-        }
 
-        function generateDivisionProblem() {
-            const B = getRandomInt(6, 25);
-            const C = getRandomInt(30, 100);
-            const A = B * C;
-            return `${A} ÷ ${B} = ___`;
-        }
-
-        function generateMultiplicationProblem() {
-            const A = getRandomInt(20, 99);
-            const B = getRandomInt(6, 49);
-            return `${A} × ${B} = ___`;
-        }
-
-        function generateWordProblem(index) {
-            const problemType = index % 5;
-            let p1, p2, unit, question;
-
-            switch (problemType) {
-                case 0:
-                    p1 = getRandomInt(10, 25);
-                    p2 = getRandomInt(5, 15);
-                    unit = p1 > 20 ? 'boxes' : 'bags';
-                    question = `A store received ${p1} ${unit} of toys. If each ${unit.slice(0, -1)} holds ${p2} toys, how many toys are there in total?`;
-                    break;
-                case 1:
-                    p1 = getRandomInt(300, 700);
-                    p2 = getRandomInt(5, 12);
-                    unit = p2 > 10 ? 'hours' : 'minutes';
-                    question = `A cyclist travels ${p1} kilometers in ${p2} ${unit}. What is the average distance traveled per unit of time?`;
-                    break;
-                case 2:
-                    p1 = getRandomInt(200, 500);
-                    p2 = getRandomInt(50, 150);
-                    question = `Lisa had $${p1}. She spent $${p2} on groceries and supplies. How much money does she have left?`;
-                    break;
-                case 3:
-                    p1 = getRandomInt(100, 250);
-                    p2 = getRandomInt(8, 15);
-                    unit = p1 > 200 ? 'pieces of fruit' : 'cookies';
-                    question = `A baker made ${p1} ${unit}. If he packs them into bags of ${p2}, how many full bags can he make?`;
-                    break;
-                case 4:
-                    p1 = getRandomInt(25, 60);
-                    p2 = getRandomInt(4, 9);
-                    question = `A construction crew lays ${p1} meters of pipe each day. How many meters of pipe will they lay in ${p2} days?`;
-                    break;
-            }
-            return question;
-        }
-
-        function generateWorksheetContent() {
-            let problems = {
-                algebra: Array.from({ length: 5 }, () => generateAlgebraProblem()),
-                division: Array.from({ length: 5 }, () => generateDivisionProblem()),
-                multiplication: Array.from({ length: 5 }, () => generateMultiplicationProblem()),
-                word: Array.from({ length: 5 }, (_, i) => generateWordProblem(i)),
-            };
-
-            // Removed 'print-only-bg' class as styling is now controlled by CSS @media print block
-            const renderSection = (title, problems, color, bgColor) => `
-                <section class="section p-4 ${bgColor} rounded-lg shadow-sm mb-6">
-                    <h2 class="text-xl font-semibold ${color} mb-3">${title}</h2>
-                    <ul class="space-y-3 list-decimal list-inside">
-                        ${problems.map(p => `<li class="problem-item text-gray-700">${p}</li>`).join('')}
+            return `
+                <section class="section-box bg-white">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-3">${title}</h2>
+                    <ul class="list-decimal list-inside space-y-3">
+                        ${problems.map(p => `<li class="problem-item">${p}</li>`).join('')}
                     </ul>
                 </section>
             `;
+        }
 
-            return `
+        // Standard Math Worksheet
+        function generateMathWorksheet() {
+            hideControlPanel();
+            const content = `
                 <header class="mb-8 border-b-2 pb-4">
                     <h1 class="text-3xl font-bold text-indigo-600">Math Practice Worksheet</h1>
                     <p class="text-gray-500 mt-1">Date: __________________________</p>
                 </header>
                 <main class="space-y-8">
-                    ${renderSection("Section A: Solve for x (Algebra)", problems.algebra, "text-indigo-700", "bg-indigo-50")}
-                    ${renderSection("Section B: Long Division", problems.division, "text-teal-700", "bg-teal-50")}
-                    ${renderSection("Section C: Multiplication", problems.multiplication, "text-orange-700", "bg-orange-50")}
-                    ${renderSection("Section D: Word Problems", problems.word, "text-pink-700", "bg-pink-50")}
+                    ${renderMathSection("Section A: Algebra", 5, "algebra")}
+                    ${renderMathSection("Section B: Division", 5, "division")}
+                    ${renderMathSection("Section C: Multiplication", 5, "multiplication")}
+                    ${renderMathSection("Section D: Word Problems", 5, "word")}
                 </main>
             `;
+            document.getElementById('worksheet-output').innerHTML = content;
         }
-        
-        // --- View Control Functions ---
-        
-        function generateWorksheet() {
-            const appContainer = document.getElementById('app');
-            const controlPanel = document.getElementById('control-panel');
-            const worksheetContainer = document.getElementById('worksheet-output');
 
-            // 1. Hide the control panel
-            controlPanel.classList.add('hidden');
+        // Swansea Worksheet
+        function generateSwanseaWorksheet() {
+            const weekId = document.getElementById('week-selector').value;
+            const data = swanseaData[weekId];
             
-            // 2. Remove the container styling for print-readiness
-            appContainer.classList.add('worksheet-view');
+            hideControlPanel();
 
-            // 3. Show the output area and generate content
-            worksheetContainer.classList.remove('hidden');
-            worksheetContainer.innerHTML = generateWorksheetContent();
+            // 1. Spelling HTML
+            const spellingHtml = data.spelling.map(word => 
+                `<div class="flex justify-between items-center border-b border-gray-200 py-2">
+                    <span class="font-mono text-lg w-1/3">${word}</span>
+                    <span class="w-2/3 border-b border-gray-300 h-6"></span>
+                 </div>`
+            ).join('');
+
+            // 2. Math Problems Logic
+            let mathProblems = [];
+            let mathHint = "";
+            if (data.math_topic.includes("Patterning")) {
+                for(let i=0; i<5; i++) { let s=getRandomInt(1,10), st=getRandomInt(2,5); mathProblems.push(`${s}, ${s+st}, ${s+st*2}, ___, ___ (Rule: +${st})`); }
+            } else if (data.math_topic.includes("Subtraction")) {
+                for(let i=0; i<5; i++) { mathProblems.push(`${getRandomInt(1000,9000)} - ${getRandomInt(100,999)} = ___`); }
+            } else if (data.math_topic.includes("Multiplication")) {
+                // Area Model Hint
+                if (data.math_topic.includes("Area Model")) {
+                    mathHint = `<p class="text-xs text-gray-500 italic mb-2">Use the <strong>Area Model</strong> strategy (box method) to solve.</p>`;
+                }
+                for(let i=0; i<4; i++) { mathProblems.push(`${getRandomInt(12,85)} &times; ${getRandomInt(11,45)} = ___`); }
+            } else if (data.math_topic.includes("Measurement") || data.math_topic.includes("Metric")) {
+                 mathProblems = ["2 kg = ______ g", "3.5 L = ______ mL", "5000 g = ______ kg", "4 m = ______ cm", "120 minutes = ______ hours"];
+            } else {
+                for(let i=0; i<5; i++) mathProblems.push(`${getRandomInt(10,50)} + ${getRandomInt(10,50)} = ___`);
+            }
+            const mathHtml = mathProblems.map(p => `<li class="problem-item py-4 text-lg">${p}</li>`).join('');
+
+            // 3. Writing Prompt Logic
+            let writingPrompt = "Write about your weekend.";
+            let writingTitle = "Writing";
+            if (data.writing_topic.includes("Narrative")) {
+                writingTitle = "Narrative Writing";
+                writingPrompt = "<strong>Task:</strong> Choose a place (e.g., an abandoned house, a sunny park). Describe it in detail. Then, explain how this setting impacts the character's mood.";
+            } else if (data.writing_topic.includes("Persuasive")) {
+                writingTitle = "Persuasive Writing";
+                writingPrompt = "<strong>Task:</strong> Write a paragraph persuading someone that winter is the best (or worst) season. Use strong vocabulary to convince the reader.";
+            } else {
+                writingPrompt = "Write a letter to a friend telling them about your week. Include questions for them.";
+            }
+
+            // 4. Critical Grammar Task
+            let criticalGrammarTask = "";
+            if (weekId == "8" || data.grammar.includes("Connecting words")) {
+                criticalGrammarTask = `
+                    <p class="font-semibold text-sm mb-2 mt-4">Critical Thinking & Grammar:</p>
+                    <p class="text-sm text-gray-700 mb-2">Choose 2 spelling words. Write a complex sentence for each using a connecting word (<em>because, although, if</em>) to show cause and effect.</p>
+                    <div class="border-b border-gray-300 h-8 w-full"></div>
+                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
+                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
+                `;
+            } else {
+                criticalGrammarTask = `
+                    <p class="font-semibold text-sm mb-2 mt-4">Grammar Application:</p>
+                    <p class="text-sm text-gray-700 mb-2">Write two sentences using words from the list above that follow the rule: ${data.grammar}</p>
+                    <div class="border-b border-gray-300 h-8 w-full"></div>
+                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
+                `;
+            }
+
+            const content = `
+                <header class="mb-6 border-b-2 pb-4 flex justify-between items-end">
+                    <div>
+                        <h1 class="text-3xl font-bold text-teal-700">Swansea Weekly Task</h1>
+                        <p class="text-gray-500 mt-1">Week ${weekId} • ${data.date}</p>
+                    </div>
+                    <div class="text-right text-sm text-gray-400">Name: __________________</div>
+                </header>
+
+                <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Col 1 -->
+                    <div>
+                        <section class="section-box bg-white">
+                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">1. Spelling & Foundations</h2>
+                            <p class="text-xs text-gray-500 italic mb-3">Focus: ${data.grammar}</p>
+                            <div class="grid grid-cols-1 gap-0 text-sm">${spellingHtml}</div>
+                            ${criticalGrammarTask}
+                        </section>
+
+                        <section class="section-box bg-white">
+                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">3. Review: ${data.science_topic}</h2>
+                            <div class="h-32 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center text-gray-400 text-sm text-center p-4">
+                                <p class="mb-2">Draw a diagram or list 3 key facts:</p>
+                                <div class="w-full h-full bg-gray-50 opacity-50"></div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Col 2 -->
+                    <div>
+                        <section class="section-box bg-white">
+                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">2. Math: ${data.math_topic}</h2>
+                            ${mathHint}
+                            <ul class="list-decimal list-inside space-y-2">
+                                ${mathHtml}
+                            </ul>
+                            ${data.math_topic.includes("Area Model") ? `
+                            <div class="mt-4 text-xs text-gray-400 italic text-center border-t pt-2">
+                                Show your work (Area Model grid) below:
+                                <div class="h-24 mt-1 border border-gray-100"></div>
+                            </div>` : ''}
+                        </section>
+
+                        <section class="section-box bg-white">
+                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">4. ${writingTitle}</h2>
+                            <p class="text-sm text-gray-800 mb-1">${writingPrompt}</p>
+                            <div class="writing-lines"></div>
+                        </section>
+                    </div>
+                </main>
+            `;
+            document.getElementById('worksheet-output').innerHTML = content;
+        }
+
+        function hideControlPanel() {
+            document.getElementById('control-panel').classList.add('hidden');
+            document.getElementById('app').classList.add('worksheet-view');
+            document.getElementById('worksheet-output').classList.remove('hidden');
         }
 
         function showControlPanel() {
-            // Placeholder function called on body load to ensure the control panel is visible initially
-            const controlPanel = document.getElementById('control-panel');
-            controlPanel.classList.remove('hidden');
+            document.getElementById('control-panel').classList.remove('hidden');
+            document.getElementById('app').classList.remove('worksheet-view');
+            document.getElementById('worksheet-output').classList.add('hidden');
         }
-
     </script>
 </body>
 </html>

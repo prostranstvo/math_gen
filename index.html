@@ -50,6 +50,12 @@
             width: 100%;
             margin-top: 10px;
         }
+        /* Grid for Minute Math */
+        .minute-math-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
 
         /* Print Styles */
         @media print {
@@ -103,7 +109,9 @@
                             <option value="5">Week 5 (Oct 31) - Persuasive & Measurement</option>
                             <option value="6">Week 6 (Nov 7) - Capacity & Suffix -ly</option>
                             <option value="7">Week 7 (Nov 14) - Multi/Div & Narrative</option>
-                            <option value="8" selected>Week 8 (Nov 21) - 2-Digit Multi & Citizenship</option>
+                            <option value="8">Week 8 (Nov 21) - 2-Digit Multi & Citizenship</option>
+                            <option value="9">Week 9 (Nov 28) - 3-Digit Div & Similes/Metaphors</option>
+                            <option value="10" selected>Week 10 (Dec 5) - Minute Math & Personification</option>
                         </select>
                         <button onclick="generateSwanseaWorksheet()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
                             Generate Weekly Task
@@ -130,7 +138,9 @@
             5: { date: "October 31, 2025", spelling: ["Disagree", "Disobey", "Disregard", "Disband", "Disconnect", "Choice", "Rejoice", "Poison", "Turmoil", "Noise", "Doubt", "Shout", "Mountain", "Encounter", "Announce"], grammar: "Prefix 'dis-', blends 'oi', 'ou'. Compound sentences.", writing_topic: "Persuasive Writing", math_topic: "Measurement (Volume/Mass)", science_topic: "Musculoskeletal System" },
             6: { date: "November 7, 2025", spelling: ["quickly", "softly", "honestly", "eventually", "rapidly", "brain", "available", "complain", "detail", "failure", "display", "birthday", "portray", "always", "betray"], grammar: "Suffix '-ly', digraphs 'ai', 'ay'. Advanced conjunctions.", writing_topic: "Persuasive Writing (Bias)", math_topic: "Metric Conversions", science_topic: "Digestive System" },
             7: { date: "November 14, 2025", spelling: ["precaution", "preview", "predetermine", "prearrange", "prepay", "thriller", "thrifty", "through", "throat", "throne", "splash", "splurge", "splatter", "splinter", "split"], grammar: "Prefix 'pre-', blends 'thr', 'spl'. Subordinating conjunctions.", writing_topic: "Narrative Writing (Setting)", math_topic: "Multiplication (9x9)", science_topic: "Digestive System" },
-            8: { date: "November 21, 2025", spelling: ["happiness", "kindness", "willingness", "loneliness", "forgiveness", "drool", "smooth", "rookie", "scooter", "kangaroo", "withdraw", "awesome", "awkward", "sprawl", "brawny"], grammar: "Suffix '-ness', vowel 'oo', 'aw'. Connecting words: because, although, if.", writing_topic: "Narrative Writing (Setting & Mood)", math_topic: "2-Digit Multiplication (Area Model)", science_topic: "Citizenship & Rights" }
+            8: { date: "November 21, 2025", spelling: ["happiness", "kindness", "willingness", "loneliness", "forgiveness", "drool", "smooth", "rookie", "scooter", "kangaroo", "withdraw", "awesome", "awkward", "sprawl", "brawny"], grammar: "Suffix '-ness', vowel 'oo', 'aw'. Connecting words: because, although, if.", writing_topic: "Narrative Writing (Setting & Mood)", math_topic: "2-Digit Multiplication (Area Model)", science_topic: "Citizenship & Rights" },
+            9: { date: "November 28, 2025", spelling: ["misplace", "misunderstand", "misbehave", "mismanage", "misinform", "approach", "groan", "loathe", "boast", "board", "society", "ancient", "achieve", "belief", "shield"], grammar: "Prefix 'mis-', digraphs 'ie', 'oa'. Similes vs Metaphors.", writing_topic: "Narrative Writing (Character Development)", math_topic: "3-Digit Division (Area Model)", science_topic: "Nervous System (Research)" },
+            10: { date: "December 5, 2025", spelling: ["lovable", "washable", "honourable", "valuable", "believable", "autumn", "auction", "applaud", "astronaut", "flaunt", "silhouette", "antique", "continue", "dialogue", "tissue"], grammar: "Suffix '-able', digraphs 'au', 'ue'. Personification & Hyperbole.", writing_topic: "Narrative Writing (Character Development)", math_topic: "Minute Math Drills (Facts up to 12)", science_topic: "Charter of Rights & Freedoms" }
         };
 
         // ==========================================
@@ -208,27 +218,61 @@
             // 2. Math Problems Logic
             let mathProblems = [];
             let mathHint = "";
+            let isMinuteMath = false;
+
             if (data.math_topic.includes("Patterning")) {
                 for(let i=0; i<5; i++) { let s=getRandomInt(1,10), st=getRandomInt(2,5); mathProblems.push(`${s}, ${s+st}, ${s+st*2}, ___, ___ (Rule: +${st})`); }
             } else if (data.math_topic.includes("Subtraction")) {
                 for(let i=0; i<5; i++) { mathProblems.push(`${getRandomInt(1000,9000)} - ${getRandomInt(100,999)} = ___`); }
-            } else if (data.math_topic.includes("Multiplication")) {
-                // Area Model Hint
+            } else if (data.math_topic.includes("Multiplication") && !data.math_topic.includes("Minute Math")) {
+                // Week 8: 2-digit Multi
                 if (data.math_topic.includes("Area Model")) {
                     mathHint = `<p class="text-xs text-gray-500 italic mb-2">Use the <strong>Area Model</strong> strategy (box method) to solve.</p>`;
                 }
                 for(let i=0; i<4; i++) { mathProblems.push(`${getRandomInt(12,85)} &times; ${getRandomInt(11,45)} = ___`); }
+            } else if (data.math_topic.includes("3-Digit Division")) {
+                // Week 9: 3-digit Div
+                mathHint = `<p class="text-xs text-gray-500 italic mb-2">Solve using Area Model or Standard Algorithm. Show Remainder (R).</p>`;
+                for(let i=0; i<4; i++) { 
+                    let divisor = getRandomInt(11, 25);
+                    let dividend = getRandomInt(100, 999);
+                    mathProblems.push(`${dividend} &div; ${divisor} = ___`); 
+                }
+            } else if (data.math_topic.includes("Minute Math")) {
+                // Week 10: Fact Drills
+                isMinuteMath = true;
+                mathHint = `<p class="text-xs text-gray-500 italic mb-2">Speed Drill: Complete as many as you can in 2 minutes!</p>`;
+                for(let i=0; i<12; i++) {
+                     if (Math.random() > 0.5) {
+                         mathProblems.push(`${getRandomInt(2,12)} &times; ${getRandomInt(2,12)} = ___`);
+                     } else {
+                         let b = getRandomInt(2,10), c = getRandomInt(2,10);
+                         mathProblems.push(`${b*c} &div; ${b} = ___`);
+                     }
+                }
             } else if (data.math_topic.includes("Measurement") || data.math_topic.includes("Metric")) {
                  mathProblems = ["2 kg = ______ g", "3.5 L = ______ mL", "5000 g = ______ kg", "4 m = ______ cm", "120 minutes = ______ hours"];
             } else {
                 for(let i=0; i<5; i++) mathProblems.push(`${getRandomInt(10,50)} + ${getRandomInt(10,50)} = ___`);
             }
-            const mathHtml = mathProblems.map(p => `<li class="problem-item py-4 text-lg">${p}</li>`).join('');
+
+            // Render Math List
+            let mathHtml = "";
+            if (isMinuteMath) {
+                 mathHtml = `<div class="minute-math-grid">` + mathProblems.map(p => `<div class="border-b border-gray-200 py-2">${p}</div>`).join('') + `</div>`;
+            } else {
+                 mathHtml = `<ul class="list-decimal list-inside space-y-2">` + mathProblems.map(p => `<li class="problem-item py-4 text-lg">${p}</li>`).join('') + `</ul>`;
+            }
+
 
             // 3. Writing Prompt Logic
             let writingPrompt = "Write about your weekend.";
             let writingTitle = "Writing";
-            if (data.writing_topic.includes("Narrative")) {
+            
+            if (data.writing_topic.includes("Character Development")) {
+                writingTitle = "Narrative: Character";
+                writingPrompt = "<strong>Task:</strong> Create a new character. Describe their appearance, personality, and one special talent. How do they react when something goes wrong?";
+            } else if (data.writing_topic.includes("Narrative")) {
                 writingTitle = "Narrative Writing";
                 writingPrompt = "<strong>Task:</strong> Choose a place (e.g., an abandoned house, a sunny park). Describe it in detail. Then, explain how this setting impacts the character's mood.";
             } else if (data.writing_topic.includes("Persuasive")) {
@@ -240,10 +284,24 @@
 
             // 4. Critical Grammar Task
             let criticalGrammarTask = "";
-            if (weekId == "8" || data.grammar.includes("Connecting words")) {
+            if (weekId == "9") {
+                 criticalGrammarTask = `
+                    <p class="font-semibold text-sm mb-2 mt-4">Figures of Speech:</p>
+                    <p class="text-sm text-gray-700 mb-2">Write one <strong>Simile</strong> (using 'like' or 'as') and one <strong>Metaphor</strong> (direct comparison) using your spelling words.</p>
+                    <div class="border-b border-gray-300 h-8 w-full"></div>
+                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
+                `;
+            } else if (weekId == "10") {
+                 criticalGrammarTask = `
+                    <p class="font-semibold text-sm mb-2 mt-4">Creative Language:</p>
+                    <p class="text-sm text-gray-700 mb-2">Write a sentence using <strong>Personification</strong> (giving human traits to an object) or <strong>Hyperbole</strong> (exaggeration).</p>
+                    <div class="border-b border-gray-300 h-8 w-full"></div>
+                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
+                `;
+            } else if (weekId == "8" || data.grammar.includes("Connecting words")) {
                 criticalGrammarTask = `
                     <p class="font-semibold text-sm mb-2 mt-4">Critical Thinking & Grammar:</p>
-                    <p class="text-sm text-gray-700 mb-2">Choose 2 spelling words. Write a complex sentence for each using a connecting word (<em>because, although, if</em>) to show cause and effect.</p>
+                    <p class="text-sm text-gray-700 mb-2">Choose 2 spelling words. Write a complex sentence for each using a connecting word (<em>because, although, if</em>).</p>
                     <div class="border-b border-gray-300 h-8 w-full"></div>
                     <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
                     <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
@@ -290,9 +348,7 @@
                         <section class="section-box bg-white">
                             <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">2. Math: ${data.math_topic}</h2>
                             ${mathHint}
-                            <ul class="list-decimal list-inside space-y-2">
-                                ${mathHtml}
-                            </ul>
+                            ${mathHtml}
                             ${data.math_topic.includes("Area Model") ? `
                             <div class="mt-4 text-xs text-gray-400 italic text-center border-t pt-2">
                                 Show your work (Area Model grid) below:

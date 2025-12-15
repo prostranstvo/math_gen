@@ -90,7 +90,7 @@
                 <!-- Standard Math Button -->
                 <div class="text-center p-6 border-2 border-dashed border-indigo-200 rounded-xl hover:border-indigo-500 transition cursor-pointer bg-indigo-50" onclick="generateMathWorksheet()">
                     <h2 class="text-2xl font-bold text-indigo-700 mb-2">Math Practice</h2>
-                    <p class="text-sm text-gray-600 mb-4">General algebra, division, multiplication & word problems.</p>
+                    <p class="text-sm text-gray-600 mb-4">Long division, double-digit multiplication & progressive word problems.</p>
                     <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
                         Generate Math Sheet
                     </button>
@@ -148,6 +148,36 @@
         // ==========================================
         function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
+        function generateProgressiveWordProblems() {
+            // Level 1: Simple Addition/Subtraction
+            let p1_a = getRandomInt(20, 50);
+            let p1_b = getRandomInt(10, p1_a - 5);
+            let p1 = `John has ${p1_a} marbles. He gives ${p1_b} to his friend. How many does he have left?`;
+
+            // Level 2: Multiplication (Groups)
+            let p2_a = getRandomInt(12, 25);
+            let p2_b = getRandomInt(15, 30);
+            let p2 = `A store has ${p2_a} boxes of chocolate. Each box contains ${p2_b} pieces. How many pieces of chocolate are there in total?`;
+
+            // Level 3: Division (Distribution)
+            let p3_divisor = getRandomInt(4, 9);
+            let p3_total = p3_divisor * getRandomInt(15, 50); 
+            let p3 = `A teacher has ${p3_total} sheets of paper to share equally among ${p3_divisor} students. How many sheets does each student get?`;
+
+            // Level 4: Multi-step (Money)
+            let p4_items = getRandomInt(3, 8);
+            let p4_cost = getRandomInt(5, 15);
+            let p4_paid = (p4_items * p4_cost) + getRandomInt(5, 20);
+            let p4 = `Sarah buys ${p4_items} books that cost $${p4_cost} each. She pays with $${p4_paid}. How much change should she receive?`;
+
+            // Level 5: Progressive/Thinking (Large numbers/Time)
+            let p5_dist = getRandomInt(400, 800);
+            let p5_speed = getRandomInt(50, 80);
+            let p5 = `A train needs to travel ${p5_dist} km. If it travels at ${p5_speed} km per hour, how many hours will the trip take?`;
+
+            return [p1, p2, p3, p4, p5];
+        }
+
         function renderMathSection(title, count, type) {
             let problems = [];
             
@@ -157,19 +187,23 @@
                      let a = getRandomInt(2,9), x = getRandomInt(2,10), b = getRandomInt(1,10);
                      problems.push(`${a}x + ${b} = ${a*x+b}`);
                 } else if (type === 'division') {
-                    let b = getRandomInt(3,12), c = getRandomInt(5,20);
-                    problems.push(`${b*c} &div; ${b} = ___`);
+                    // Long Division: 3 or 4 digit dividend / 1 or 2 digit divisor
+                    let divisor = getRandomInt(4, 15);
+                    let quotient = getRandomInt(50, 300); // Ensures large dividend
+                    let dividend = divisor * quotient;
+                    problems.push(`${dividend} &div; ${divisor} = ___`);
                 } else if (type === 'multiplication') {
-                    problems.push(`${getRandomInt(10,99)} &times; ${getRandomInt(2,9)} = ___`);
+                    // Double Digits: 2-digit * 2-digit
+                    let a = getRandomInt(12, 99);
+                    let b = getRandomInt(12, 99);
+                    problems.push(`${a} &times; ${b} = ___`);
                 } else if (type === 'word') {
-                    problems = [
-                        "A box holds 12 pencils. How many pencils in 8 boxes?",
-                        "Tom runs 5km a day. How far in a week?",
-                        "Share 48 cookies among 6 kids.",
-                        "Book cost $15. You have $50. Change?",
-                        "3 hours = how many minutes?"
-                    ];
+                   // Handled separately to ensure progression
                 }
+            }
+
+            if (type === 'word') {
+                problems = generateProgressiveWordProblems();
             }
 
             return `
@@ -191,10 +225,10 @@
                     <p class="text-gray-500 mt-1">Date: __________________________</p>
                 </header>
                 <main class="space-y-8">
-                    ${renderMathSection("Section A: Algebra", 5, "algebra")}
-                    ${renderMathSection("Section B: Division", 5, "division")}
-                    ${renderMathSection("Section C: Multiplication", 5, "multiplication")}
-                    ${renderMathSection("Section D: Word Problems", 5, "word")}
+                    ${renderMathSection("Section A: Double-Digit Multiplication", 5, "multiplication")}
+                    ${renderMathSection("Section B: Long Division", 5, "division")}
+                    ${renderMathSection("Section C: Algebra Practice", 5, "algebra")}
+                    ${renderMathSection("Section D: Progressive Word Problems", 5, "word")}
                 </main>
             `;
             document.getElementById('worksheet-output').innerHTML = content;

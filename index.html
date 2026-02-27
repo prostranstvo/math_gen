@@ -90,7 +90,7 @@
                 <!-- Standard Math Button -->
                 <div class="text-center p-6 border-2 border-dashed border-indigo-200 rounded-xl hover:border-indigo-500 transition cursor-pointer bg-indigo-50" onclick="generateMathWorksheet()">
                     <h2 class="text-2xl font-bold text-indigo-700 mb-2">Math Practice</h2>
-                    <p class="text-sm text-gray-600 mb-4">Long division, double-digit multiplication & progressive word problems.</p>
+                    <p class="text-sm text-gray-600 mb-4">Division, Algebra Balance, and Word Problem Progression.</p>
                     <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
                         Generate Math Sheet
                     </button>
@@ -148,67 +148,86 @@
         // ==========================================
         function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-        function generateProgressiveWordProblems() {
-            // Level 1: Simple Addition/Subtraction
-            let p1_a = getRandomInt(20, 50);
-            let p1_b = getRandomInt(10, p1_a - 5);
-            let p1 = `John has ${p1_a} marbles. He gives ${p1_b} to his friend. How many does he have left?`;
+        function generateAlgebraWordProblems() {
+            let problems = [];
 
-            // Level 2: Multiplication (Groups)
-            let p2_a = getRandomInt(12, 25);
-            let p2_b = getRandomInt(15, 30);
-            let p2 = `A store has ${p2_a} boxes of chocolate. Each box contains ${p2_b} pieces. How many pieces of chocolate are there in total?`;
+            // Problem 1: Packs and loose items
+            let packs = getRandomInt(2, 5);
+            let perPack = getRandomInt(5, 12);
+            let loose = getRandomInt(2, 9);
+            let total = (packs * perPack) + loose;
+            problems.push(`You have ${packs} packs of cards and ${loose} loose cards. If you have a total of ${total} cards, how many cards are in each pack?`);
 
-            // Level 3: Division (Distribution)
-            let p3_divisor = getRandomInt(4, 9);
-            let p3_total = p3_divisor * getRandomInt(15, 50); 
-            let p3 = `A teacher has ${p3_total} sheets of paper to share equally among ${p3_divisor} students. How many sheets does each student get?`;
+            // Problem 2: Buying items with change
+            let items = getRandomInt(3, 6);
+            let price = getRandomInt(4, 9);
+            let change = getRandomInt(2, 7);
+            let paid = (items * price) + change;
+            problems.push(`Maya bought ${items} identical notebooks. She paid with a $${paid} bill and received $${change} back in change. What was the cost of one notebook?`);
 
-            // Level 4: Multi-step (Money)
-            let p4_items = getRandomInt(3, 8);
-            let p4_cost = getRandomInt(5, 15);
-            let p4_paid = (p4_items * p4_cost) + getRandomInt(5, 20);
-            let p4 = `Sarah buys ${p4_items} books that cost $${p4_cost} each. She pays with $${p4_paid}. How much change should she receive?`;
+            // Problem 3: Age/Logic
+            let baseAge = getRandomInt(5, 15);
+            let multiplier = getRandomInt(2, 4);
+            let diff = getRandomInt(1, 5);
+            let targetAge = (baseAge * multiplier) + diff;
+            problems.push(`A father is ${targetAge} years old. He is ${diff} years older than ${multiplier} times his son's age. How old is the son?`);
 
-            // Level 5: Progressive/Thinking (Large numbers/Time)
-            let p5_dist = getRandomInt(400, 800);
-            let p5_speed = getRandomInt(50, 80);
-            let p5 = `A train needs to travel ${p5_dist} km. If it travels at ${p5_speed} km per hour, how many hours will the trip take?`;
+            // Problem 4: Points/Scoring
+            let games = getRandomInt(4, 8);
+            let avgPoints = getRandomInt(10, 20);
+            let bonus = getRandomInt(5, 15);
+            let totalPoints = (games * avgPoints) + bonus;
+            problems.push(`A basketball player scored ${bonus} points in their first game and an equal number of points in each of the next ${games} games. If they scored ${totalPoints} points in total, how many points did they score in each of those ${games} games?`);
 
-            return [p1, p2, p3, p4, p5];
+            // Problem 5: Grouping/Logic
+            let groups = getRandomInt(3, 6);
+            let size = getRandomInt(6, 15);
+            let extra = getRandomInt(3, 10);
+            let grandTotal = (groups * size) + extra;
+            problems.push(`A teacher has ${grandTotal} pencils. After giving ${extra} pencils to the office, she divides the rest equally among ${groups} classes. How many pencils does each class get?`);
+
+            return problems;
+        }
+
+        function generateAlgebraBalanceProblem() {
+            let x = getRandomInt(2, 10);
+            let c = getRandomInt(1, 5);
+            let a = c + getRandomInt(1, 5);
+            let k = (a - c) * x;
+            let b = getRandomInt(1, 15);
+            let d = k + b;
+            if (Math.random() > 0.5) {
+                let b_neg = getRandomInt(1, 10);
+                let d_new = ((a - c) * x) - b_neg;
+                if (d_new > 0) return `${a}x - ${b_neg} = ${c}x + ${d_new}`;
+            }
+            return `${a}x + ${b} = ${c}x + ${d}`;
         }
 
         function renderMathSection(title, count, type) {
             let problems = [];
+            let hint = "";
             
-            // Generate problems based on type
-            for(let i=0; i<count; i++) {
-                if(type === 'algebra') {
-                     let a = getRandomInt(2,9), x = getRandomInt(2,10), b = getRandomInt(1,10);
-                     problems.push(`${a}x + ${b} = ${a*x+b}`);
-                } else if (type === 'division') {
-                    // Long Division: 3 or 4 digit dividend / 1 or 2 digit divisor
+            if(type === 'algebra_balance') {
+                for(let i=0; i<count; i++) problems.push(generateAlgebraBalanceProblem());
+                hint = "Goal: Move variables to one side and constants to the other. Show your steps!";
+            } else if (type === 'division') {
+                for(let i=0; i<count; i++) {
                     let divisor = getRandomInt(4, 15);
-                    let quotient = getRandomInt(50, 300); // Ensures large dividend
-                    let dividend = divisor * quotient;
-                    problems.push(`${dividend} &div; ${divisor} = ___`);
-                } else if (type === 'multiplication') {
-                    // Double Digits: 2-digit * 2-digit
-                    let a = getRandomInt(12, 99);
-                    let b = getRandomInt(12, 99);
-                    problems.push(`${a} &times; ${b} = ___`);
-                } else if (type === 'word') {
-                   // Handled separately to ensure progression
+                    let quotient = getRandomInt(40, 250);
+                    problems.push(`${divisor * quotient} &div; ${divisor} = ___`);
                 }
-            }
-
-            if (type === 'word') {
-                problems = generateProgressiveWordProblems();
+            } else if (type === 'multiplication') {
+                for(let i=0; i<count; i++) problems.push(`${getRandomInt(12, 99)} &times; ${getRandomInt(12, 99)} = ___`);
+            } else if (type === 'word') {
+                problems = generateAlgebraWordProblems();
+                hint = "Show the equation you used to solve the problem (e.g., 3x + 2 = 17).";
             }
 
             return `
                 <section class="section-box bg-white">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-3">${title}</h2>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-1">${title}</h2>
+                    ${hint ? `<p class="text-xs text-gray-500 italic mb-3">${hint}</p>` : ''}
                     <ul class="list-decimal list-inside space-y-3">
                         ${problems.map(p => `<li class="problem-item">${p}</li>`).join('')}
                     </ul>
@@ -216,7 +235,6 @@
             `;
         }
 
-        // Standard Math Worksheet
         function generateMathWorksheet() {
             hideControlPanel();
             const content = `
@@ -225,23 +243,20 @@
                     <p class="text-gray-500 mt-1">Date: __________________________</p>
                 </header>
                 <main class="space-y-8">
-                    ${renderMathSection("Section A: Double-Digit Multiplication", 5, "multiplication")}
+                    ${renderMathSection("Section A: Multiplication Practice", 5, "multiplication")}
                     ${renderMathSection("Section B: Long Division", 5, "division")}
-                    ${renderMathSection("Section C: Algebra Practice", 5, "algebra")}
-                    ${renderMathSection("Section D: Progressive Word Problems", 5, "word")}
+                    ${renderMathSection("Section C: Algebra: Balance & Logic (Variables on Both Sides)", 5, "algebra_balance")}
+                    ${renderMathSection("Section D: Algebra Word Problems", 5, "word")}
                 </main>
             `;
             document.getElementById('worksheet-output').innerHTML = content;
         }
 
-        // Swansea Worksheet
         function generateSwanseaWorksheet() {
             const weekId = document.getElementById('week-selector').value;
             const data = swanseaData[weekId];
-            
             hideControlPanel();
 
-            // 1. Spelling HTML
             const spellingHtml = data.spelling.map(word => 
                 `<div class="flex justify-between items-center border-b border-gray-200 py-2">
                     <span class="font-mono text-lg w-1/3">${word}</span>
@@ -249,104 +264,16 @@
                  </div>`
             ).join('');
 
-            // 2. Math Problems Logic
             let mathProblems = [];
-            let mathHint = "";
-            let isMinuteMath = false;
+            let isMinuteMath = data.math_topic.includes("Minute Math");
 
-            if (data.math_topic.includes("Patterning")) {
-                for(let i=0; i<5; i++) { let s=getRandomInt(1,10), st=getRandomInt(2,5); mathProblems.push(`${s}, ${s+st}, ${s+st*2}, ___, ___ (Rule: +${st})`); }
-            } else if (data.math_topic.includes("Subtraction")) {
-                for(let i=0; i<5; i++) { mathProblems.push(`${getRandomInt(1000,9000)} - ${getRandomInt(100,999)} = ___`); }
-            } else if (data.math_topic.includes("Multiplication") && !data.math_topic.includes("Minute Math")) {
-                // Week 8: 2-digit Multi
-                if (data.math_topic.includes("Area Model")) {
-                    mathHint = `<p class="text-xs text-gray-500 italic mb-2">Use the <strong>Area Model</strong> strategy (box method) to solve.</p>`;
-                }
-                for(let i=0; i<4; i++) { mathProblems.push(`${getRandomInt(12,85)} &times; ${getRandomInt(11,45)} = ___`); }
-            } else if (data.math_topic.includes("3-Digit Division")) {
-                // Week 9: 3-digit Div
-                mathHint = `<p class="text-xs text-gray-500 italic mb-2">Solve using Area Model or Standard Algorithm. Show Remainder (R).</p>`;
-                for(let i=0; i<4; i++) { 
-                    let divisor = getRandomInt(11, 25);
-                    let dividend = getRandomInt(100, 999);
-                    mathProblems.push(`${dividend} &div; ${divisor} = ___`); 
-                }
-            } else if (data.math_topic.includes("Minute Math")) {
-                // Week 10: Fact Drills
-                isMinuteMath = true;
-                mathHint = `<p class="text-xs text-gray-500 italic mb-2">Speed Drill: Complete as many as you can in 2 minutes!</p>`;
+            if (isMinuteMath) {
                 for(let i=0; i<12; i++) {
-                     if (Math.random() > 0.5) {
-                         mathProblems.push(`${getRandomInt(2,12)} &times; ${getRandomInt(2,12)} = ___`);
-                     } else {
-                         let b = getRandomInt(2,10), c = getRandomInt(2,10);
-                         mathProblems.push(`${b*c} &div; ${b} = ___`);
-                     }
+                     if (Math.random() > 0.5) mathProblems.push(`${getRandomInt(2,12)} &times; ${getRandomInt(2,12)} = ___`);
+                     else { let b=getRandomInt(2,10), c=getRandomInt(2,10); mathProblems.push(`${b*c} &div; ${b} = ___`); }
                 }
-            } else if (data.math_topic.includes("Measurement") || data.math_topic.includes("Metric")) {
-                 mathProblems = ["2 kg = ______ g", "3.5 L = ______ mL", "5000 g = ______ kg", "4 m = ______ cm", "120 minutes = ______ hours"];
             } else {
                 for(let i=0; i<5; i++) mathProblems.push(`${getRandomInt(10,50)} + ${getRandomInt(10,50)} = ___`);
-            }
-
-            // Render Math List
-            let mathHtml = "";
-            if (isMinuteMath) {
-                 mathHtml = `<div class="minute-math-grid">` + mathProblems.map(p => `<div class="border-b border-gray-200 py-2">${p}</div>`).join('') + `</div>`;
-            } else {
-                 mathHtml = `<ul class="list-decimal list-inside space-y-2">` + mathProblems.map(p => `<li class="problem-item py-4 text-lg">${p}</li>`).join('') + `</ul>`;
-            }
-
-
-            // 3. Writing Prompt Logic
-            let writingPrompt = "Write about your weekend.";
-            let writingTitle = "Writing";
-            
-            if (data.writing_topic.includes("Character Development")) {
-                writingTitle = "Narrative: Character";
-                writingPrompt = "<strong>Task:</strong> Create a new character. Describe their appearance, personality, and one special talent. How do they react when something goes wrong?";
-            } else if (data.writing_topic.includes("Narrative")) {
-                writingTitle = "Narrative Writing";
-                writingPrompt = "<strong>Task:</strong> Choose a place (e.g., an abandoned house, a sunny park). Describe it in detail. Then, explain how this setting impacts the character's mood.";
-            } else if (data.writing_topic.includes("Persuasive")) {
-                writingTitle = "Persuasive Writing";
-                writingPrompt = "<strong>Task:</strong> Write a paragraph persuading someone that winter is the best (or worst) season. Use strong vocabulary to convince the reader.";
-            } else {
-                writingPrompt = "Write a letter to a friend telling them about your week. Include questions for them.";
-            }
-
-            // 4. Critical Grammar Task
-            let criticalGrammarTask = "";
-            if (weekId == "9") {
-                 criticalGrammarTask = `
-                    <p class="font-semibold text-sm mb-2 mt-4">Figures of Speech:</p>
-                    <p class="text-sm text-gray-700 mb-2">Write one <strong>Simile</strong> (using 'like' or 'as') and one <strong>Metaphor</strong> (direct comparison) using your spelling words.</p>
-                    <div class="border-b border-gray-300 h-8 w-full"></div>
-                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
-                `;
-            } else if (weekId == "10") {
-                 criticalGrammarTask = `
-                    <p class="font-semibold text-sm mb-2 mt-4">Creative Language:</p>
-                    <p class="text-sm text-gray-700 mb-2">Write a sentence using <strong>Personification</strong> (giving human traits to an object) or <strong>Hyperbole</strong> (exaggeration).</p>
-                    <div class="border-b border-gray-300 h-8 w-full"></div>
-                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
-                `;
-            } else if (weekId == "8" || data.grammar.includes("Connecting words")) {
-                criticalGrammarTask = `
-                    <p class="font-semibold text-sm mb-2 mt-4">Critical Thinking & Grammar:</p>
-                    <p class="text-sm text-gray-700 mb-2">Choose 2 spelling words. Write a complex sentence for each using a connecting word (<em>because, although, if</em>).</p>
-                    <div class="border-b border-gray-300 h-8 w-full"></div>
-                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
-                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
-                `;
-            } else {
-                criticalGrammarTask = `
-                    <p class="font-semibold text-sm mb-2 mt-4">Grammar Application:</p>
-                    <p class="text-sm text-gray-700 mb-2">Write two sentences using words from the list above that follow the rule: ${data.grammar}</p>
-                    <div class="border-b border-gray-300 h-8 w-full"></div>
-                    <div class="border-b border-gray-300 h-8 w-full mt-2"></div>
-                `;
             }
 
             const content = `
@@ -357,42 +284,25 @@
                     </div>
                     <div class="text-right text-sm text-gray-400">Name: __________________</div>
                 </header>
-
                 <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Col 1 -->
                     <div>
                         <section class="section-box bg-white">
                             <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">1. Spelling & Foundations</h2>
-                            <p class="text-xs text-gray-500 italic mb-3">Focus: ${data.grammar}</p>
                             <div class="grid grid-cols-1 gap-0 text-sm">${spellingHtml}</div>
-                            ${criticalGrammarTask}
                         </section>
-
                         <section class="section-box bg-white">
                             <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">3. Review: ${data.science_topic}</h2>
-                            <div class="h-32 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center text-gray-400 text-sm text-center p-4">
-                                <p class="mb-2">Draw a diagram or list 3 key facts:</p>
-                                <div class="w-full h-full bg-gray-50 opacity-50"></div>
-                            </div>
+                            <div class="h-32 border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-400 text-sm p-4">Draw or list 3 facts.</div>
                         </section>
                     </div>
-
-                    <!-- Col 2 -->
                     <div>
                         <section class="section-box bg-white">
                             <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">2. Math: ${data.math_topic}</h2>
-                            ${mathHint}
-                            ${mathHtml}
-                            ${data.math_topic.includes("Area Model") ? `
-                            <div class="mt-4 text-xs text-gray-400 italic text-center border-t pt-2">
-                                Show your work (Area Model grid) below:
-                                <div class="h-24 mt-1 border border-gray-100"></div>
-                            </div>` : ''}
+                            ${isMinuteMath ? `<div class="minute-math-grid">` + mathProblems.map(p => `<div class="border-b py-2">${p}</div>`).join('') + `</div>` : `<ul class="list-decimal list-inside space-y-2">` + mathProblems.map(p => `<li class="problem-item py-4 text-lg">${p}</li>`).join('') + `</ul>`}
                         </section>
-
                         <section class="section-box bg-white">
-                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">4. ${writingTitle}</h2>
-                            <p class="text-sm text-gray-800 mb-1">${writingPrompt}</p>
+                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">4. Writing Prompt</h2>
+                            <p class="text-sm text-gray-800 mb-1">${data.writing_topic}</p>
                             <div class="writing-lines"></div>
                         </section>
                     </div>

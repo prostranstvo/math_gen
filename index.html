@@ -151,40 +151,45 @@
         function generateAlgebraWordProblems() {
             let problems = [];
 
-            // Problem 1: Packs and loose items
-            let packs = getRandomInt(2, 5);
-            let perPack = getRandomInt(5, 12);
-            let loose = getRandomInt(2, 9);
-            let total = (packs * perPack) + loose;
-            problems.push(`You have ${packs} packs of cards and ${loose} loose cards. If you have a total of ${total} cards, how many cards are in each pack?`);
+            // Problem 1: Sports Cards (ax + b = c)
+            let packs = getRandomInt(3, 8);
+            let perPack = getRandomInt(8, 15);
+            let loose = getRandomInt(4, 12);
+            let totalCards = (packs * perPack) + loose;
+            problems.push(`You have ${packs} unopened packs of sports cards and ${loose} loose cards in a binder. If you have a total of ${totalCards} cards, how many cards are in each pack?`);
 
-            // Problem 2: Buying items with change
-            let items = getRandomInt(3, 6);
-            let price = getRandomInt(4, 9);
-            let change = getRandomInt(2, 7);
-            let paid = (items * price) + change;
-            problems.push(`Maya bought ${items} identical notebooks. She paid with a $${paid} bill and received $${change} back in change. What was the cost of one notebook?`);
+            // Problem 2: Baseball Gear / Distribution a(x + b) = c
+            let players = getRandomInt(9, 15);
+            let gloveCost = getRandomInt(25, 45);
+            let batCost = getRandomInt(15, 35);
+            let totalCost = players * (gloveCost + batCost);
+            problems.push(`A baseball coach is buying gear for their ${players} players. Each player gets a glove that costs $${gloveCost} and a practice bat. If the coach spent a total of $${totalCost}, how much did each bat cost?`);
 
-            // Problem 3: Age/Logic
-            let baseAge = getRandomInt(5, 15);
-            let multiplier = getRandomInt(2, 4);
-            let diff = getRandomInt(1, 5);
-            let targetAge = (baseAge * multiplier) + diff;
-            problems.push(`A father is ${targetAge} years old. He is ${diff} years older than ${multiplier} times his son's age. How old is the son?`);
+            // Problem 3: Diecast Hot Wheels / Ratios (x + mx = c)
+            let multiplier = getRandomInt(2, 5);
+            let friendCars = getRandomInt(15, 40);
+            let totalCars = friendCars + (friendCars * multiplier);
+            problems.push(`You and your friend are combining your diecast Hot Wheels collections. You have ${multiplier} times as many cars as your friend. If together you have a total of ${totalCars} cars, how many cars does your friend have?`);
 
-            // Problem 4: Points/Scoring
-            let games = getRandomInt(4, 8);
-            let avgPoints = getRandomInt(10, 20);
-            let bonus = getRandomInt(5, 15);
-            let totalPoints = (games * avgPoints) + bonus;
-            problems.push(`A basketball player scored ${bonus} points in their first game and an equal number of points in each of the next ${games} games. If they scored ${totalPoints} points in total, how many points did they score in each of those ${games} games?`);
+            // Problem 4: Basketball/Soccer Scoring (ax + b = c)
+            let games = getRandomInt(4, 7);
+            let avgPoints = getRandomInt(12, 28);
+            let firstGame = getRandomInt(8, 20);
+            let totalPoints = (games * avgPoints) + firstGame;
+            problems.push(`In a basketball tournament, a player scored ${firstGame} points in their first game. They then scored the exact same number of points in each of their next ${games} games. If they scored ${totalPoints} points in total, how many points did they score in each of those next ${games} games?`);
 
-            // Problem 5: Grouping/Logic
-            let groups = getRandomInt(3, 6);
-            let size = getRandomInt(6, 15);
-            let extra = getRandomInt(3, 10);
-            let grandTotal = (groups * size) + extra;
-            problems.push(`A teacher has ${grandTotal} pencils. After giving ${extra} pencils to the office, she divides the rest equally among ${groups} classes. How many pencils does each class get?`);
+            // Problem 5: Bicycles / Distance (ax + b = c)
+            let days = getRandomInt(3, 5);
+            let dailyKm = getRandomInt(8, 20);
+            let weekendKm = getRandomInt(25, 50);
+            let totalKm = (days * dailyKm) + weekendKm;
+            problems.push(`A cyclist rides their bicycle the exact same distance for ${days} days during the week. On the weekend, they go for a long ride of ${weekendKm} km. If they rode a total of ${totalKm} km that week, how far did they ride on each of the weekdays?`);
+
+            // Shuffle the array so the problem types appear in a different order each time
+            for (let i = problems.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [problems[i], problems[j]] = [problems[j], problems[i]];
+            }
 
             return problems;
         }

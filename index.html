@@ -7,24 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: white;
+            background: #f8fafc;
             color: #1f2937;
             padding: 20px;
             margin: 0;
         }
-        /* Default container styles */
+
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background-color: white;
             padding: 40px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
+            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+            border-radius: 18px;
             min-height: 200px;
         }
-        /* Worksheet View: Clean for printing */
+
         .worksheet-view {
             box-shadow: none !important;
             padding: 0 !important;
@@ -32,75 +33,295 @@
             max-width: 8.5in;
             background-color: transparent !important;
         }
-        .problem-item {
-            padding: 8px 0;
-            border-bottom: 1px dashed #e5e7eb;
-        }
+
         .section-box {
             border: 1px solid #e5e7eb;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 18px;
+            border-radius: 12px;
             margin-bottom: 20px;
+            background: white;
         }
-        .writing-lines {
-            line-height: 2.5em;
-            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
-            background-size: 100% 2.5em;
-            height: 150px;
-            width: 100%;
-            margin-top: 10px;
+
+        .problem-item {
+            padding: 12px 0;
+            border-bottom: 1px dashed #e5e7eb;
         }
-        /* Grid for Minute Math */
+
+        .problem-item:last-child {
+            border-bottom: none;
+        }
+
+        .answer-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .problem-copy {
+            flex: 1 1 320px;
+            min-width: 0;
+        }
+
+        .answer-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        .answer-input {
+            width: 108px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 1rem;
+            color: #0f172a;
+            background: white;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+        }
+
+        .answer-row-error {
+            background: #fef2f2;
+            border-color: #fecaca !important;
+        }
+
+        .answer-row-correct {
+            background: #f0fdf4;
+            border-color: #bbf7d0 !important;
+        }
+
         .minute-math-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .minute-math-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px;
+            min-height: 84px;
+        }
+
+        .task-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .task-check input {
+            width: 18px;
+            height: 18px;
+            accent-color: #0f766e;
+        }
+
+        .task-check-error {
+            border-color: #fca5a5;
+            background: #fef2f2;
+        }
+
+        .writing-lines {
+            line-height: 2.4em;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 100% 2.4em;
+            min-height: 150px;
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        .review-box {
+            min-height: 150px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #64748b;
+            padding: 16px;
+            margin-top: 10px;
+        }
+
+        .page-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .progress-panel {
+            margin-top: 32px;
+            border: 1px solid #fde68a;
+            background: linear-gradient(135deg, #fff9db, #fffbeb);
+        }
+
+        .progress-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(245, 158, 11, 0.12);
+            color: #92400e;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-weight: 700;
+        }
+
+        .recent-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0 0;
+            display: grid;
             gap: 10px;
         }
 
-        /* Print Styles */
-        @media print {
-            body { padding: 0; }
-            .no-print { display: none !important; }
-            .container { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
-            
-            /* Force white backgrounds */
-            .section, .section-box {
-                background-color: white !important; 
-                box-shadow: none !important;
-                border: 1px solid #ccc !important;
+        .recent-item {
+            padding: 12px 14px;
+            border: 1px solid rgba(245, 158, 11, 0.18);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .celebration-card {
+            max-width: 720px;
+            margin: 0 auto;
+            text-align: center;
+            border: 1px solid #fde68a;
+            background: linear-gradient(180deg, #fffef3, #ffffff);
+        }
+
+        .trophy-badge {
+            width: 104px;
+            height: 104px;
+            border-radius: 999px;
+            margin: 0 auto 18px;
+            display: grid;
+            place-items: center;
+            font-size: 3rem;
+            background: radial-gradient(circle at top, #fde68a, #f59e0b);
+            box-shadow: 0 16px 36px rgba(245, 158, 11, 0.28);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .summary-tile {
+            border: 1px solid #f3f4f6;
+            border-radius: 14px;
+            padding: 16px;
+            background: #ffffff;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
             }
-            .problem-item { border-bottom: 1px dashed #333; }
-            .writing-lines { background-image: linear-gradient(#999 1px, transparent 1px); }
-            
-            .page-break { page-break-before: always; }
+
+            .container {
+                padding: 22px 18px;
+                border-radius: 14px;
+            }
+
+            .answer-label {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .answer-input {
+                width: 96px;
+            }
+
+            .minute-math-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .section-box,
+            .minute-math-card,
+            .recent-item,
+            .summary-tile {
+                background: white !important;
+                box-shadow: none !important;
+                border: 1px solid #d1d5db !important;
+            }
+
+            .problem-item {
+                border-bottom: 1px dashed #9ca3af;
+            }
+
+            .writing-lines {
+                background-image: linear-gradient(#9ca3af 1px, transparent 1px);
+            }
+
+            .answer-input {
+                box-shadow: none !important;
+                border-color: #6b7280 !important;
+            }
         }
     </style>
 </head>
 <body onload="showControlPanel()">
     <div id="app" class="container">
-
-        <!-- 1. Control Panel View -->
         <div id="control-panel">
             <header class="mb-10 border-b-2 pb-6">
                 <h1 class="text-4xl font-extrabold text-gray-800 text-center">Classroom Homework Generator</h1>
-                <p class="text-center text-gray-500 mt-2">Select a tool to generate a print-ready worksheet.</p>
+                <p class="text-center text-gray-500 mt-2">Generate simple static worksheets and keep a little trophy shelf for finished work.</p>
             </header>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                <!-- Standard Math Button -->
                 <div class="text-center p-6 border-2 border-dashed border-indigo-200 rounded-xl hover:border-indigo-500 transition cursor-pointer bg-indigo-50" onclick="generateMathWorksheet()">
                     <h2 class="text-2xl font-bold text-indigo-700 mb-2">Math Practice</h2>
-                    <p class="text-sm text-gray-600 mb-4">Division, Algebra Balance, and Word Problem Progression.</p>
+                    <p class="text-sm text-gray-600 mb-4">Keep the same generator, now with answer boxes and finish checking.</p>
                     <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
                         Generate Math Sheet
                     </button>
                 </div>
 
-                <!-- Swansea Weekly Button -->
-                <div class="text-center p-6 border-2 border-dashed border-teal-200 rounded-xl hover:border-teal-500 transition cursor-pointer bg-teal-50">
-                    <h2 class="text-2xl font-bold text-teal-700 mb-2">Swansea Weekly Tasks</h2>
-                    <p class="text-sm text-gray-600 mb-4">Curriculum-aligned tasks based on Weekly Updates.</p>
-                    
+                <div class="text-center p-6 border-2 border-dashed border-teal-200 rounded-xl hover:border-teal-500 transition bg-teal-50">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-2">Full Homework</h2>
+                    <p class="text-sm text-gray-600 mb-4">Combine the math generator with the selected weekly homework in one page.</p>
+
                     <div class="flex flex-col space-y-2">
                         <select id="week-selector" class="p-2 border rounded text-gray-700 mb-2">
                             <option value="2">Week 2 (Oct 10) - Patterning & Letter Writing</option>
@@ -113,24 +334,25 @@
                             <option value="9">Week 9 (Nov 28) - 3-Digit Div & Similes/Metaphors</option>
                             <option value="10" selected>Week 10 (Dec 5) - Minute Math & Personification</option>
                         </select>
-                        <button onclick="generateSwanseaWorksheet()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
-                            Generate Weekly Task
+                        <button onclick="generateFullHomework()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition">
+                            Generate Full Homework
                         </button>
                     </div>
                 </div>
             </div>
+
+            <div id="home-progress"></div>
         </div>
-        
-        <!-- 2. Worksheet Output Area -->
-        <div id="worksheet-output" class="hidden">
-            <!-- Content will be generated here -->
-        </div>
+
+        <div id="worksheet-output" class="hidden"></div>
     </div>
 
     <script>
-        // ==========================================
-        // DATA: Swansea Curriculum
-        // ==========================================
+        const STORAGE_KEYS = {
+            trophies: 'homeworkTrophyCount',
+            history: 'homeworkCompletionHistory'
+        };
+
         const swanseaData = {
             2: { date: "October 10, 2025", spelling: ["review", "rebuild", "replace", "reconsider", "restore", "thought", "theme", "thunder", "thousand", "theory", "whisper", "whistle", "whimsical", "while", "whirlwind"], grammar: "Prefix 're-' and digraphs 'th', 'wh'.", writing_topic: "Letter Writing (Formal vs Informal)", math_topic: "Patterning", science_topic: "Circulatory System" },
             3: { date: "October 17, 2025", spelling: ["Reading", "Building", "Creating", "Understanding", "Communicating", "Breathe", "Reason", "Speaker", "Release", "Appeal", "Indeed", "Succeed", "Squeeze", "Foresee", "Guarantee"], grammar: "Suffix '-ing', digraphs 'ea', 'ee'.", writing_topic: "Letter Writing (Revising & Drafting)", math_topic: "Estimation (Add/Sub)", science_topic: "Circulatory System (Diseases)" },
@@ -143,189 +365,612 @@
             10: { date: "December 5, 2025", spelling: ["lovable", "washable", "honourable", "valuable", "believable", "autumn", "auction", "applaud", "astronaut", "flaunt", "silhouette", "antique", "continue", "dialogue", "tissue"], grammar: "Suffix '-able', digraphs 'au', 'ue'. Personification & Hyperbole.", writing_topic: "Narrative Writing (Character Development)", math_topic: "Minute Math Drills (Facts up to 12)", science_topic: "Charter of Rights & Freedoms" }
         };
 
-        // ==========================================
-        // LOGIC: Generators
-        // ==========================================
-        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        let worksheetState = createEmptyWorksheetState();
 
-        function generateAlgebraWordProblems() {
-            let problems = [];
-
-            // Problem 1: Sports Cards (ax + b = c)
-            let packs = getRandomInt(3, 8);
-            let perPack = getRandomInt(8, 15);
-            let loose = getRandomInt(4, 12);
-            let totalCards = (packs * perPack) + loose;
-            problems.push(`You have ${packs} unopened packs of sports cards and ${loose} loose cards in a binder. If you have a total of ${totalCards} cards, how many cards are in each pack?`);
-
-            // Problem 2: Baseball Gear / Distribution a(x + b) = c
-            let players = getRandomInt(9, 15);
-            let gloveCost = getRandomInt(25, 45);
-            let batCost = getRandomInt(15, 35);
-            let totalCost = players * (gloveCost + batCost);
-            problems.push(`A baseball coach is buying gear for their ${players} players. Each player gets a glove that costs $${gloveCost} and a practice bat. If the coach spent a total of $${totalCost}, how much did each bat cost?`);
-
-            // Problem 3: Diecast Hot Wheels / Ratios (x + mx = c)
-            let multiplier = getRandomInt(2, 5);
-            let friendCars = getRandomInt(15, 40);
-            let totalCars = friendCars + (friendCars * multiplier);
-            problems.push(`You and your friend are combining your diecast Hot Wheels collections. You have ${multiplier} times as many cars as your friend. If together you have a total of ${totalCars} cars, how many cars does your friend have?`);
-
-            // Problem 4: Basketball/Soccer Scoring (ax + b = c)
-            let games = getRandomInt(4, 7);
-            let avgPoints = getRandomInt(12, 28);
-            let firstGame = getRandomInt(8, 20);
-            let totalPoints = (games * avgPoints) + firstGame;
-            problems.push(`In a basketball tournament, a player scored ${firstGame} points in their first game. They then scored the exact same number of points in each of their next ${games} games. If they scored ${totalPoints} points in total, how many points did they score in each of those next ${games} games?`);
-
-            // Problem 5: Bicycles / Distance (ax + b = c)
-            let days = getRandomInt(3, 5);
-            let dailyKm = getRandomInt(8, 20);
-            let weekendKm = getRandomInt(25, 50);
-            let totalKm = (days * dailyKm) + weekendKm;
-            problems.push(`A cyclist rides their bicycle the exact same distance for ${days} days during the week. On the weekend, they go for a long ride of ${weekendKm} km. If they rode a total of ${totalKm} km that week, how far did they ride on each of the weekdays?`);
-
-            // Shuffle the array so the problem types appear in a different order each time
-            for (let i = problems.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [problems[i], problems[j]] = [problems[j], problems[i]];
-            }
-
-            return problems;
+        function createEmptyWorksheetState() {
+            return {
+                id: '',
+                type: '',
+                selectedWeekId: null,
+                correctAnswers: {},
+                manualCheckboxState: {},
+                completed: false
+            };
         }
 
-        function generateAlgebraBalanceProblem() {
-            let x = getRandomInt(2, 10);
-            let c = getRandomInt(1, 5);
-            let a = c + getRandomInt(1, 5);
-            let k = (a - c) * x;
-            let b = getRandomInt(1, 15);
-            let d = k + b;
-            if (Math.random() > 0.5) {
-                let b_neg = getRandomInt(1, 10);
-                let d_new = ((a - c) * x) - b_neg;
-                if (d_new > 0) return `${a}x - ${b_neg} = ${c}x + ${d_new}`;
-            }
-            return `${a}x + ${b} = ${c}x + ${d}`;
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function renderMathSection(title, count, type) {
-            let problems = [];
-            let hint = "";
-            
-            if(type === 'algebra_balance') {
-                for(let i=0; i<count; i++) problems.push(generateAlgebraBalanceProblem());
-                hint = "Goal: Move variables to one side and constants to the other. Show your steps!";
-            } else if (type === 'division') {
-                for(let i=0; i<count; i++) {
-                    let divisor = getRandomInt(4, 15);
-                    let quotient = getRandomInt(40, 250);
-                    problems.push(`${divisor * quotient} &div; ${divisor} = ___`);
-                }
-            } else if (type === 'multiplication') {
-                for(let i=0; i<count; i++) problems.push(`${getRandomInt(12, 99)} &times; ${getRandomInt(12, 99)} = ___`);
-            } else if (type === 'word') {
-                problems = generateAlgebraWordProblems();
-                hint = "Show the equation you used to solve the problem (e.g., 3x + 2 = 17).";
+        function shuffleArray(items) {
+            const copy = [...items];
+            for (let index = copy.length - 1; index > 0; index -= 1) {
+                const swapIndex = Math.floor(Math.random() * (index + 1));
+                [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
             }
+            return copy;
+        }
 
-            return `
-                <section class="section-box bg-white">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-1">${title}</h2>
-                    ${hint ? `<p class="text-xs text-gray-500 italic mb-3">${hint}</p>` : ''}
-                    <ul class="list-decimal list-inside space-y-3">
-                        ${problems.map(p => `<li class="problem-item">${p}</li>`).join('')}
-                    </ul>
+        function createProblem(prompt, answer) {
+            return { prompt, answer: String(answer) };
+        }
+
+        function beginWorksheet(type, selectedWeekId) {
+            worksheetState = {
+                id: `${type}-${Date.now()}-${getRandomInt(100, 999)}`,
+                type,
+                selectedWeekId: selectedWeekId || null,
+                correctAnswers: {},
+                manualCheckboxState: {},
+                completed: false
+            };
+        }
+
+        function registerAnswer(answer, prefix) {
+            const answerId = `${worksheetState.id}-${prefix}-${Object.keys(worksheetState.correctAnswers).length + 1}`;
+            worksheetState.correctAnswers[answerId] = String(answer);
+            return answerId;
+        }
+
+        function registerManualTask(taskKey) {
+            const checkboxId = `${worksheetState.id}-${taskKey}`;
+            worksheetState.manualCheckboxState[checkboxId] = false;
+            return checkboxId;
+        }
+
+        function loadStoredValue(key, fallbackValue) {
+            try {
+                const rawValue = localStorage.getItem(key);
+                return rawValue ? JSON.parse(rawValue) : fallbackValue;
+            } catch (error) {
+                return fallbackValue;
+            }
+        }
+
+        function saveStoredValue(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+            } catch (error) {
+                console.warn(`Unable to save ${key}`, error);
+            }
+        }
+
+        function getTrophyCount() {
+            return Number(loadStoredValue(STORAGE_KEYS.trophies, 0)) || 0;
+        }
+
+        function getCompletionHistory() {
+            return loadStoredValue(STORAGE_KEYS.history, []);
+        }
+
+        function getWorksheetLabel(type, weekId) {
+            if (type === 'full-homework' && weekId) {
+                return `Full Homework - Week ${weekId}`;
+            }
+            return 'Math Practice';
+        }
+
+        function formatCompletionDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+        }
+
+        function renderHomeProgress() {
+            const history = getCompletionHistory();
+            const trophies = getTrophyCount();
+            const recentItems = history.slice(0, 4);
+
+            const historyHtml = recentItems.length
+                ? `<ul class="recent-list">
+                    ${recentItems.map((item) => `
+                        <li class="recent-item">
+                            <div class="font-semibold text-gray-800">${item.label}</div>
+                            <div class="text-sm text-gray-500">${formatCompletionDate(item.completedAt)}</div>
+                        </li>
+                    `).join('')}
+                   </ul>`
+                : `<p class="text-sm text-amber-800 mt-4">No finished worksheets yet. The first completed page will start the trophy shelf.</p>`;
+
+            document.getElementById('home-progress').innerHTML = `
+                <section class="section-box progress-panel max-w-2xl mx-auto">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-amber-900">Accepted Homework</h2>
+                            <p class="text-sm text-amber-800 mt-1">Finished pages stay in this browser so you can see recent progress at a glance.</p>
+                        </div>
+                        <div class="progress-pill">
+                            <span aria-hidden="true">🏆</span>
+                            <span>${trophies} ${trophies === 1 ? 'trophy' : 'trophies'}</span>
+                        </div>
+                    </div>
+                    ${historyHtml}
                 </section>
             `;
         }
 
-        function generateMathWorksheet() {
-            hideControlPanel();
-            const content = `
-                <header class="mb-8 border-b-2 pb-4">
-                    <h1 class="text-3xl font-bold text-indigo-600">Math Practice Worksheet</h1>
-                    <p class="text-gray-500 mt-1">Date: __________________________</p>
-                </header>
-                <main class="space-y-8">
-                    ${renderMathSection("Section A: Multiplication Practice", 5, "multiplication")}
-                    ${renderMathSection("Section B: Long Division", 5, "division")}
-                    ${renderMathSection("Section C: Algebra: Balance & Logic (Variables on Both Sides)", 5, "algebra_balance")}
-                    ${renderMathSection("Section D: Algebra Word Problems", 5, "word")}
-                </main>
-            `;
-            document.getElementById('worksheet-output').innerHTML = content;
+        function showControlPanel() {
+            worksheetState = createEmptyWorksheetState();
+            document.getElementById('control-panel').classList.remove('hidden');
+            document.getElementById('app').classList.remove('worksheet-view');
+            document.getElementById('worksheet-output').classList.add('hidden');
+            document.getElementById('worksheet-output').innerHTML = '';
+            renderHomeProgress();
         }
 
-        function generateSwanseaWorksheet() {
-            const weekId = document.getElementById('week-selector').value;
-            const data = swanseaData[weekId];
-            hideControlPanel();
-
-            const spellingHtml = data.spelling.map(word => 
-                `<div class="flex justify-between items-center border-b border-gray-200 py-2">
-                    <span class="font-mono text-lg w-1/3">${word}</span>
-                    <span class="w-2/3 border-b border-gray-300 h-6"></span>
-                 </div>`
-            ).join('');
-
-            let mathProblems = [];
-            let isMinuteMath = data.math_topic.includes("Minute Math");
-
-            if (isMinuteMath) {
-                for(let i=0; i<12; i++) {
-                     if (Math.random() > 0.5) mathProblems.push(`${getRandomInt(2,12)} &times; ${getRandomInt(2,12)} = ___`);
-                     else { let b=getRandomInt(2,10), c=getRandomInt(2,10); mathProblems.push(`${b*c} &div; ${b} = ___`); }
-                }
-            } else {
-                for(let i=0; i<5; i++) mathProblems.push(`${getRandomInt(10,50)} + ${getRandomInt(10,50)} = ___`);
-            }
-
-            const content = `
-                <header class="mb-6 border-b-2 pb-4 flex justify-between items-end">
-                    <div>
-                        <h1 class="text-3xl font-bold text-teal-700">Swansea Weekly Task</h1>
-                        <p class="text-gray-500 mt-1">Week ${weekId} • ${data.date}</p>
-                    </div>
-                    <div class="text-right text-sm text-gray-400">Name: __________________</div>
-                </header>
-                <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <section class="section-box bg-white">
-                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">1. Spelling & Foundations</h2>
-                            <div class="grid grid-cols-1 gap-0 text-sm">${spellingHtml}</div>
-                        </section>
-                        <section class="section-box bg-white">
-                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">3. Review: ${data.science_topic}</h2>
-                            <div class="h-32 border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-400 text-sm p-4">Draw or list 3 facts.</div>
-                        </section>
-                    </div>
-                    <div>
-                        <section class="section-box bg-white">
-                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">2. Math: ${data.math_topic}</h2>
-                            ${isMinuteMath ? `<div class="minute-math-grid">` + mathProblems.map(p => `<div class="border-b py-2">${p}</div>`).join('') + `</div>` : `<ul class="list-decimal list-inside space-y-2">` + mathProblems.map(p => `<li class="problem-item py-4 text-lg">${p}</li>`).join('') + `</ul>`}
-                        </section>
-                        <section class="section-box bg-white">
-                            <h2 class="text-lg font-bold text-teal-800 mb-2 border-b pb-1">4. Writing Prompt</h2>
-                            <p class="text-sm text-gray-800 mb-1">${data.writing_topic}</p>
-                            <div class="writing-lines"></div>
-                        </section>
-                    </div>
-                </main>
-            `;
-            document.getElementById('worksheet-output').innerHTML = content;
-        }
-
-        function hideControlPanel() {
+        function showWorksheetView() {
             document.getElementById('control-panel').classList.add('hidden');
             document.getElementById('app').classList.add('worksheet-view');
             document.getElementById('worksheet-output').classList.remove('hidden');
         }
 
-        function showControlPanel() {
-            document.getElementById('control-panel').classList.remove('hidden');
+        function showCelebrationView() {
+            document.getElementById('control-panel').classList.add('hidden');
             document.getElementById('app').classList.remove('worksheet-view');
-            document.getElementById('worksheet-output').classList.add('hidden');
+            document.getElementById('worksheet-output').classList.remove('hidden');
+        }
+
+        function generateAlgebraBalanceProblem() {
+            const answer = getRandomInt(2, 10);
+            const c = getRandomInt(1, 5);
+            const a = c + getRandomInt(1, 5);
+            const k = (a - c) * answer;
+            const b = getRandomInt(1, 15);
+            const d = k + b;
+
+            if (Math.random() > 0.5) {
+                const bNegative = getRandomInt(1, 10);
+                const dNew = ((a - c) * answer) - bNegative;
+                if (dNew > 0) {
+                    return createProblem(`${a}x - ${bNegative} = ${c}x + ${dNew}`, answer);
+                }
+            }
+
+            return createProblem(`${a}x + ${b} = ${c}x + ${d}`, answer);
+        }
+
+        function generateAlgebraWordProblems() {
+            const problems = [];
+
+            const packs = getRandomInt(3, 8);
+            const perPack = getRandomInt(8, 15);
+            const loose = getRandomInt(4, 12);
+            const totalCards = (packs * perPack) + loose;
+            problems.push(createProblem(`You have ${packs} unopened packs of sports cards and ${loose} loose cards in a binder. If you have a total of ${totalCards} cards, how many cards are in each pack?`, perPack));
+
+            const players = getRandomInt(9, 15);
+            const gloveCost = getRandomInt(25, 45);
+            const batCost = getRandomInt(15, 35);
+            const totalCost = players * (gloveCost + batCost);
+            problems.push(createProblem(`A baseball coach is buying gear for ${players} players. Each player gets a glove that costs $${gloveCost} and a practice bat. If the coach spent a total of $${totalCost}, how much did each bat cost?`, batCost));
+
+            const multiplier = getRandomInt(2, 5);
+            const friendCars = getRandomInt(15, 40);
+            const totalCars = friendCars + (friendCars * multiplier);
+            problems.push(createProblem(`You and your friend are combining your diecast Hot Wheels collections. You have ${multiplier} times as many cars as your friend. If together you have ${totalCars} cars, how many cars does your friend have?`, friendCars));
+
+            const games = getRandomInt(4, 7);
+            const avgPoints = getRandomInt(12, 28);
+            const firstGame = getRandomInt(8, 20);
+            const totalPoints = (games * avgPoints) + firstGame;
+            problems.push(createProblem(`In a basketball tournament, a player scored ${firstGame} points in the first game. They then scored the same number of points in each of the next ${games} games. If they scored ${totalPoints} points in total, how many points did they score in each of those next ${games} games?`, avgPoints));
+
+            const days = getRandomInt(3, 5);
+            const dailyKm = getRandomInt(8, 20);
+            const weekendKm = getRandomInt(25, 50);
+            const totalKm = (days * dailyKm) + weekendKm;
+            problems.push(createProblem(`A cyclist rides the same distance for ${days} weekdays. On the weekend, they go for a long ride of ${weekendKm} km. If they rode ${totalKm} km in total that week, how far did they ride on each weekday?`, dailyKm));
+
+            return shuffleArray(problems);
+        }
+
+        function buildMultiplicationProblems(count) {
+            return Array.from({ length: count }, () => {
+                const left = getRandomInt(12, 99);
+                const right = getRandomInt(12, 99);
+                return createProblem(`${left} &times; ${right} =`, left * right);
+            });
+        }
+
+        function buildDivisionProblems(count) {
+            return Array.from({ length: count }, () => {
+                const divisor = getRandomInt(4, 15);
+                const quotient = getRandomInt(40, 250);
+                return createProblem(`${divisor * quotient} &div; ${divisor} =`, quotient);
+            });
+        }
+
+        function buildAlgebraBalanceProblems(count) {
+            return Array.from({ length: count }, () => generateAlgebraBalanceProblem());
+        }
+
+        function buildWeeklyMathProblems(data) {
+            const isMinuteMath = data.math_topic.includes("Minute Math");
+
+            if (isMinuteMath) {
+                return {
+                    isMinuteMath: true,
+                    problems: Array.from({ length: 12 }, () => {
+                        if (Math.random() > 0.5) {
+                            const left = getRandomInt(2, 12);
+                            const right = getRandomInt(2, 12);
+                            return createProblem(`${left} &times; ${right} =`, left * right);
+                        }
+
+                        const divisor = getRandomInt(2, 10);
+                        const quotient = getRandomInt(2, 10);
+                        return createProblem(`${divisor * quotient} &div; ${divisor} =`, quotient);
+                    })
+                };
+            }
+
+            return {
+                isMinuteMath: false,
+                problems: Array.from({ length: 5 }, () => {
+                    const left = getRandomInt(10, 50);
+                    const right = getRandomInt(10, 50);
+                    return createProblem(`${left} + ${right} =`, left + right);
+                })
+            };
+        }
+
+        function renderAnswerInput(answerId) {
+            return `<input type="text" inputmode="numeric" autocomplete="off" class="answer-input" data-answer-id="${answerId}" oninput="clearAnswerState(this)" aria-label="Answer">`;
+        }
+
+        function renderProblemList(problems, prefix) {
+            return `
+                <ol class="list-decimal pl-5 space-y-2">
+                    ${problems.map((problem) => {
+                        const answerId = registerAnswer(problem.answer, prefix);
+                        return `
+                            <li class="problem-item" data-answer-row="${answerId}">
+                                <div class="answer-line">
+                                    <div class="problem-copy">${problem.prompt}</div>
+                                    <label class="answer-label">
+                                        <span>Answer</span>
+                                        ${renderAnswerInput(answerId)}
+                                    </label>
+                                </div>
+                            </li>
+                        `;
+                    }).join('')}
+                </ol>
+            `;
+        }
+
+        function renderProblemGrid(problems, prefix) {
+            return `
+                <div class="minute-math-grid">
+                    ${problems.map((problem) => {
+                        const answerId = registerAnswer(problem.answer, prefix);
+                        return `
+                            <div class="minute-math-card" data-answer-row="${answerId}">
+                                <div class="answer-line">
+                                    <div class="problem-copy font-medium">${problem.prompt}</div>
+                                    <label class="answer-label">
+                                        <span>Answer</span>
+                                        ${renderAnswerInput(answerId)}
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function renderMathSection(title, problems, prefix, hint) {
+            return `
+                <section class="section-box">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-1">${title}</h2>
+                    ${hint ? `<p class="text-xs text-gray-500 italic mb-3">${hint}</p>` : ''}
+                    ${renderProblemList(problems, prefix)}
+                </section>
+            `;
+        }
+
+        function renderManualCheckbox(taskKey, label) {
+            const checkboxId = registerManualTask(taskKey);
+            return `
+                <label class="task-check" data-task-check="${checkboxId}">
+                    <input type="checkbox" id="${checkboxId}" onchange="updateManualCheckState('${checkboxId}', this.checked)">
+                    <span>${label}</span>
+                </label>
+            `;
+        }
+
+        function renderWorksheetFrame(title, subtitle, accentClass, actionLabel, actionHandler, sectionsHtml) {
+            return `
+                <header class="mb-8 border-b-2 pb-4">
+                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                        <div>
+                            <h1 class="text-3xl font-bold ${accentClass}">${title}</h1>
+                            <p class="text-gray-500 mt-1">${subtitle}</p>
+                        </div>
+                        <div class="text-sm text-gray-400 md:text-right">
+                            <div>Name: __________________</div>
+                            <div class="mt-1">Date: __________________</div>
+                        </div>
+                    </div>
+                    <div class="page-actions no-print">
+                        <button onclick="showControlPanel()" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-2 px-4 rounded-lg transition">Back Home</button>
+                        <button onclick="window.print()" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-2 px-4 rounded-lg transition">Print</button>
+                        <button onclick="${actionHandler}" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition">${actionLabel}</button>
+                    </div>
+                </header>
+                <main class="space-y-8">
+                    ${sectionsHtml}
+                </main>
+            `;
+        }
+
+        function generateMathWorksheet() {
+            beginWorksheet('math-practice');
+            showWorksheetView();
+
+            const content = renderWorksheetFrame(
+                'Math Practice Worksheet',
+                'Answer every problem, then check the page to mark it complete.',
+                'text-indigo-600',
+                'Check and Finish',
+                'finishMathWorksheet()',
+                `
+                    ${renderMathSection("Section A: Multiplication Practice", buildMultiplicationProblems(5), "math-multiply")}
+                    ${renderMathSection("Section B: Long Division", buildDivisionProblems(5), "math-division")}
+                    ${renderMathSection("Section C: Algebra: Balance & Logic", buildAlgebraBalanceProblems(5), "math-balance", "Goal: solve for x and show your steps if you are working on paper.")}
+                    ${renderMathSection("Section D: Algebra Word Problems", generateAlgebraWordProblems(), "math-word", "Show the equation you used if you want extra practice on paper.")}
+                `
+            );
+
+            document.getElementById('worksheet-output').innerHTML = content;
+        }
+
+        function generateFullHomework(weekOverride) {
+            const weekId = weekOverride || document.getElementById('week-selector').value;
+            const data = swanseaData[weekId];
+            const weeklyMath = buildWeeklyMathProblems(data);
+            const spellingHtml = data.spelling.map((word) => `
+                <div class="flex justify-between items-center border-b border-gray-200 py-2">
+                    <span class="font-mono text-lg w-1/3">${word}</span>
+                    <span class="w-2/3 border-b border-gray-300 h-6"></span>
+                </div>
+            `).join('');
+
+            beginWorksheet('full-homework', weekId);
+            showWorksheetView();
+
+            const weeklyMathHtml = weeklyMath.isMinuteMath
+                ? renderProblemGrid(weeklyMath.problems, "weekly-math")
+                : renderProblemList(weeklyMath.problems, "weekly-math");
+
+            const content = renderWorksheetFrame(
+                'Full Homework Sheet',
+                `Week ${weekId} • ${data.date} • Finish the math, then check off the open-ended tasks.`,
+                'text-teal-700',
+                'Finish Homework',
+                'finishFullHomework()',
+                `
+                    ${renderMathSection("Part 1A: Multiplication Practice", buildMultiplicationProblems(5), "full-math-multiply")}
+                    ${renderMathSection("Part 1B: Long Division", buildDivisionProblems(5), "full-math-division")}
+                    ${renderMathSection("Part 1C: Algebra: Balance & Logic", buildAlgebraBalanceProblems(5), "full-math-balance", "Goal: solve for x and show your steps if you are working on paper.")}
+                    ${renderMathSection("Part 1D: Algebra Word Problems", generateAlgebraWordProblems(), "full-math-word", "Show the equation you used if you want extra practice on paper.")}
+
+                    <section class="section-box page-break">
+                        <h2 class="text-xl font-semibold text-teal-800 mb-2">Part 2: Spelling & Foundations</h2>
+                        <p class="text-sm text-gray-500 mb-4">${data.grammar}</p>
+                        <div class="grid grid-cols-1 gap-0 text-sm">${spellingHtml}</div>
+                        ${renderManualCheckbox("spelling", "I finished the spelling practice for this week.")}
+                    </section>
+
+                    <section class="section-box">
+                        <h2 class="text-xl font-semibold text-teal-800 mb-2">Part 3: Weekly Math - ${data.math_topic}</h2>
+                        ${weeklyMathHtml}
+                    </section>
+
+                    <section class="section-box">
+                        <h2 class="text-xl font-semibold text-teal-800 mb-2">Part 4: Review - ${data.science_topic}</h2>
+                        <div class="review-box">Draw or list 3 facts about this topic.</div>
+                        ${renderManualCheckbox("science-review", "I finished the review task.")}
+                    </section>
+
+                    <section class="section-box">
+                        <h2 class="text-xl font-semibold text-teal-800 mb-2">Part 5: Writing Prompt</h2>
+                        <p class="text-sm text-gray-800 mb-1">${data.writing_topic}</p>
+                        <div class="writing-lines"></div>
+                        ${renderManualCheckbox("writing", "I finished the writing task.")}
+                    </section>
+                `
+            );
+
+            document.getElementById('worksheet-output').innerHTML = content;
+        }
+
+        function generateSwanseaWorksheet() {
+            generateFullHomework();
+        }
+
+        function clearAnswerState(input) {
+            const row = input.closest('[data-answer-row]');
+            if (row) {
+                row.classList.remove('answer-row-error', 'answer-row-correct');
+            }
+        }
+
+        function updateManualCheckState(checkboxId, checked) {
+            worksheetState.manualCheckboxState[checkboxId] = checked;
+            const row = document.querySelector(`[data-task-check="${checkboxId}"]`);
+            if (row) {
+                row.classList.remove('task-check-error');
+            }
+        }
+
+        function answersMatch(userAnswer, expectedAnswer) {
+            const trimmedAnswer = String(userAnswer || '').trim();
+            const trimmedExpected = String(expectedAnswer || '').trim();
+
+            if (!trimmedAnswer) {
+                return false;
+            }
+
+            const numericAnswer = Number(trimmedAnswer);
+            const numericExpected = Number(trimmedExpected);
+
+            if (!Number.isNaN(numericAnswer) && !Number.isNaN(numericExpected)) {
+                return numericAnswer === numericExpected;
+            }
+
+            return trimmedAnswer.toLowerCase() === trimmedExpected.toLowerCase();
+        }
+
+        function validateMathAnswers() {
+            const invalidInputs = [];
+
+            Object.entries(worksheetState.correctAnswers).forEach(([answerId, expectedAnswer]) => {
+                const input = document.querySelector(`[data-answer-id="${answerId}"]`);
+                const row = document.querySelector(`[data-answer-row="${answerId}"]`);
+                const isValid = input && answersMatch(input.value, expectedAnswer);
+
+                if (row) {
+                    row.classList.remove('answer-row-error', 'answer-row-correct');
+                }
+
+                if (isValid) {
+                    if (row) {
+                        row.classList.add('answer-row-correct');
+                    }
+                    return;
+                }
+
+                if (row) {
+                    row.classList.add('answer-row-error');
+                }
+
+                if (input) {
+                    invalidInputs.push(input);
+                }
+            });
+
+            return invalidInputs;
+        }
+
+        function validateManualTasks() {
+            const missingTasks = [];
+
+            Object.keys(worksheetState.manualCheckboxState).forEach((checkboxId) => {
+                const checkbox = document.getElementById(checkboxId);
+                const row = document.querySelector(`[data-task-check="${checkboxId}"]`);
+                const isChecked = Boolean(checkbox && checkbox.checked);
+
+                worksheetState.manualCheckboxState[checkboxId] = isChecked;
+
+                if (row) {
+                    row.classList.toggle('task-check-error', !isChecked);
+                }
+
+                if (!isChecked && checkbox) {
+                    missingTasks.push(checkbox);
+                }
+            });
+
+            return missingTasks;
+        }
+
+        function recordCompletion() {
+            const nextTrophyCount = getTrophyCount() + 1;
+            const history = getCompletionHistory();
+            const entry = {
+                id: worksheetState.id,
+                type: worksheetState.type,
+                weekId: worksheetState.selectedWeekId,
+                label: getWorksheetLabel(worksheetState.type, worksheetState.selectedWeekId),
+                completedAt: new Date().toISOString()
+            };
+
+            history.unshift(entry);
+            saveStoredValue(STORAGE_KEYS.trophies, nextTrophyCount);
+            saveStoredValue(STORAGE_KEYS.history, history.slice(0, 20));
+
+            return { trophies: nextTrophyCount, entry };
+        }
+
+        function renderCompletionScreen(completionData) {
+            const repeatAction = completionData.entry.type === 'full-homework'
+                ? `generateFullHomework('${completionData.entry.weekId}')`
+                : 'generateMathWorksheet()';
+
+            showCelebrationView();
+            document.getElementById('worksheet-output').innerHTML = `
+                <section class="section-box celebration-card">
+                    <div class="trophy-badge" aria-hidden="true">🏆</div>
+                    <h1 class="text-3xl font-bold text-amber-700">Homework Complete</h1>
+                    <p class="text-gray-600 mt-3">Everything needed for this page has been checked. This worksheet is now added to the local trophy shelf.</p>
+
+                    <div class="summary-grid">
+                        <div class="summary-tile">
+                            <div class="text-sm text-gray-500">Finished Page</div>
+                            <div class="text-lg font-bold text-gray-800 mt-1">${completionData.entry.label}</div>
+                        </div>
+                        <div class="summary-tile">
+                            <div class="text-sm text-gray-500">Total Trophies</div>
+                            <div class="text-3xl font-extrabold text-amber-600 mt-1">${completionData.trophies}</div>
+                        </div>
+                        <div class="summary-tile">
+                            <div class="text-sm text-gray-500">Saved</div>
+                            <div class="text-lg font-semibold text-gray-800 mt-1">${formatCompletionDate(completionData.entry.completedAt)}</div>
+                        </div>
+                    </div>
+
+                    <div class="page-actions no-print justify-center">
+                        <button onclick="showControlPanel()" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-2 px-4 rounded-lg transition">Back Home</button>
+                        <button onclick="${repeatAction}" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition">Generate Another</button>
+                    </div>
+                </section>
+            `;
+        }
+
+        function completeCurrentWorksheet() {
+            if (worksheetState.completed) {
+                return;
+            }
+
+            worksheetState.completed = true;
+            const completionData = recordCompletion();
+            renderCompletionScreen(completionData);
+        }
+
+        function finishMathWorksheet() {
+            const invalidAnswers = validateMathAnswers();
+
+            if (invalidAnswers.length > 0) {
+                alert(`There ${invalidAnswers.length === 1 ? 'is 1 answer' : `are ${invalidAnswers.length} answers`} to fix before this page can be finished.`);
+                invalidAnswers[0].focus();
+                return;
+            }
+
+            completeCurrentWorksheet();
+        }
+
+        function finishFullHomework() {
+            const invalidAnswers = validateMathAnswers();
+            const missingTasks = validateManualTasks();
+
+            if (invalidAnswers.length > 0 || missingTasks.length > 0) {
+                const messages = [];
+
+                if (invalidAnswers.length > 0) {
+                    messages.push(`${invalidAnswers.length} math answer${invalidAnswers.length === 1 ? '' : 's'}`);
+                }
+
+                if (missingTasks.length > 0) {
+                    messages.push(`${missingTasks.length} finished task checkbox${missingTasks.length === 1 ? '' : 'es'}`);
+                }
+
+                alert(`Please fix ${messages.join(' and ')} before finishing the homework.`);
+                (invalidAnswers[0] || missingTasks[0]).focus();
+                return;
+            }
+
+            completeCurrentWorksheet();
         }
     </script>
 </body>

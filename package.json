@@ -1,0 +1,10 @@
+{
+  "name": "math_gen",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8123",
+    "import:weeks": "node ./scripts/import-weekly-updates.js",
+    "test": "node --test"
+  }
+}

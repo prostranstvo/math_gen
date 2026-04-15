@@ -1,27 +1,27 @@
 :root {
     color-scheme: light;
-    --bg: oklch(0.98 0.004 258);
-    --surface: oklch(0.995 0.003 258);
-    --surface-soft: oklch(0.975 0.005 258);
-    --surface-band: oklch(0.955 0.008 258);
-    --surface-mist: oklch(0.97 0.01 224);
-    --surface-warm: oklch(0.972 0.012 82);
-    --text: oklch(0.24 0.01 258);
-    --text-soft: oklch(0.53 0.01 258);
-    --line: oklch(0.88 0.005 258);
-    --line-strong: oklch(0.8 0.008 258);
-    --accent: oklch(0.59 0.17 253);
-    --accent-soft: oklch(0.95 0.02 246);
-    --math-accent: oklch(0.64 0.13 20);
-    --math-soft: oklch(0.95 0.02 20);
-    --game-accent: oklch(0.62 0.11 168);
-    --game-soft: oklch(0.96 0.02 168);
-    --success: oklch(0.72 0.12 150);
-    --success-soft: oklch(0.96 0.03 150);
-    --danger: oklch(0.64 0.18 24);
-    --danger-soft: oklch(0.96 0.03 24);
-    --focus: oklch(0.74 0.12 252);
-    --shadow-soft: 0 10px 30px color-mix(in srgb, var(--text) 6%, transparent);
+    --bg: #f7f8fb;
+    --surface: #fcfcfe;
+    --surface-soft: #f5f7fb;
+    --surface-band: #eef1f7;
+    --surface-mist: #eef5fa;
+    --surface-warm: #fbf5ee;
+    --text: #1f2430;
+    --text-soft: #69707d;
+    --line: #dde2ea;
+    --line-strong: #c8ced9;
+    --accent: #4f78f6;
+    --accent-soft: #edf2ff;
+    --math-accent: #c8755e;
+    --math-soft: #fff1eb;
+    --game-accent: #2f9177;
+    --game-soft: #edf8f4;
+    --success: #4ca56d;
+    --success-soft: #eef8f1;
+    --danger: #d45e51;
+    --danger-soft: #fff0ed;
+    --focus: #6e80f4;
+    --shadow-soft: 0 10px 30px rgba(31, 36, 48, 0.08);
     --radius-xl: 2rem;
     --radius-lg: 1.5rem;
     --radius-md: 1rem;
@@ -37,6 +37,32 @@
     --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
     --font-soft: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Hiragino Rounded ProN", var(--font-ui);
     --transition: 220ms ease;
+}
+
+@supports (color: oklch(0.5 0 0)) {
+    :root {
+        --bg: oklch(0.98 0.004 258);
+        --surface: oklch(0.995 0.003 258);
+        --surface-soft: oklch(0.975 0.005 258);
+        --surface-band: oklch(0.955 0.008 258);
+        --surface-mist: oklch(0.97 0.01 224);
+        --surface-warm: oklch(0.972 0.012 82);
+        --text: oklch(0.24 0.01 258);
+        --text-soft: oklch(0.53 0.01 258);
+        --line: oklch(0.88 0.005 258);
+        --line-strong: oklch(0.8 0.008 258);
+        --accent: oklch(0.59 0.17 253);
+        --accent-soft: oklch(0.95 0.02 246);
+        --math-accent: oklch(0.64 0.13 20);
+        --math-soft: oklch(0.95 0.02 20);
+        --game-accent: oklch(0.62 0.11 168);
+        --game-soft: oklch(0.96 0.02 168);
+        --success: oklch(0.72 0.12 150);
+        --success-soft: oklch(0.96 0.03 150);
+        --danger: oklch(0.64 0.18 24);
+        --danger-soft: oklch(0.96 0.03 24);
+        --focus: oklch(0.74 0.12 252);
+    }
 }
 
 * {
@@ -1142,6 +1168,174 @@ a:focus-visible {
 .game-entry-form .button {
     width: auto;
     min-width: 12rem;
+}
+
+@supports not (background: color-mix(in srgb, black 50%, white)) {
+    .home-local-nav {
+        border: 1px solid #d1d7e0;
+        background: rgba(252, 252, 254, 0.92);
+        box-shadow: 0 10px 30px rgba(31, 36, 48, 0.08);
+    }
+
+    .hero-preview {
+        border: 1px solid #d1d7e0;
+        box-shadow:
+            0 26px 64px rgba(31, 36, 48, 0.09),
+            0 10px 28px rgba(31, 36, 48, 0.05),
+            0 0 34px rgba(255, 255, 255, 0.68);
+    }
+
+    .preview-kicker,
+    .product-kicker {
+        background: #eceff5;
+    }
+
+    .hero-preview--secondary {
+        background: linear-gradient(180deg, #fff4ef, var(--surface));
+    }
+
+    .hero-preview--tertiary {
+        background: linear-gradient(180deg, #eef8f4, var(--surface));
+    }
+
+    .home-section--band {
+        background: linear-gradient(180deg, var(--surface-band), var(--surface));
+    }
+
+    .product-panel {
+        border: 1px solid #d1d7e0;
+        background: var(--surface);
+    }
+
+    .product-panel--primary {
+        background: linear-gradient(180deg, var(--surface), #f3f6ff);
+    }
+
+    .product-panel--secondary {
+        background: linear-gradient(180deg, var(--surface), #fff3ed);
+    }
+
+    .product-panel--tertiary {
+        background: linear-gradient(180deg, var(--surface), #eef8f4);
+    }
+
+    .select-field {
+        background: #fafbfe;
+    }
+
+    .history-item,
+    .problem-row--grid,
+    .spelling-row,
+    .review-box,
+    .text-entry,
+    .task-row,
+    .game-status,
+    .game-card,
+    .game-entry-form {
+        background: #f7f9fc;
+    }
+
+    .button--secondary {
+        background: #c8755e;
+    }
+
+    .button--tertiary {
+        background: #2f9177;
+    }
+
+    .sheet-hero--homework {
+        background: linear-gradient(180deg, #eef3ff, transparent 72%);
+    }
+
+    .sheet-hero--math {
+        background: linear-gradient(180deg, #fff2ec, transparent 72%);
+    }
+
+    .sheet-hero--game {
+        background: linear-gradient(180deg, #eef8f4, transparent 72%);
+    }
+
+    .sheet-badge {
+        background: #f7f9fc;
+    }
+
+    .validation-summary {
+        background: #fff3f1;
+        border: 1px solid #f0c7c1;
+    }
+
+    .section-sheet--soft {
+        background: var(--surface-soft);
+    }
+
+    .section-sheet--mist {
+        background: var(--surface-mist);
+    }
+
+    .section-sheet--warm {
+        background: var(--surface-warm);
+    }
+
+    .section-sheet--game {
+        background: linear-gradient(180deg, #eef8f4, var(--surface));
+    }
+
+    .problem-row--valid,
+    .spelling-row--valid,
+    .text-entry--valid,
+    .game-status--success {
+        background: #eef8f1;
+    }
+
+    .problem-row--invalid,
+    .task-row--invalid,
+    .spelling-row--invalid,
+    .text-entry--invalid,
+    .game-status--error {
+        background: #fff1ee;
+    }
+
+    .spelling-word {
+        background: #edf2ff;
+        border: 1px solid #d1d7e0;
+    }
+
+    .spelling-attempt--invalid {
+        background: rgba(212, 94, 81, 0.12);
+    }
+
+    .spelling-attempt--valid {
+        background: rgba(76, 165, 109, 0.12);
+    }
+
+    .text-entry-input--lined {
+        background-image: linear-gradient(#cfd6e2 1px, transparent 1px);
+    }
+
+    .game-progress-dot {
+        background: #c8ced9;
+    }
+
+    .game-word-chip {
+        background: #eef8f4;
+        border: 1px solid #d1d7e0;
+    }
+
+    .game-focus-word,
+    .game-entry-stage {
+        background: linear-gradient(180deg, #eef8f4, var(--surface));
+        border: 1px solid #d1d7e0;
+    }
+
+    .game-entry-input {
+        border: 1px solid #d1d7e0;
+        background: rgba(252, 252, 254, 0.9);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    }
+
+    .game-entry-input::placeholder {
+        color: #98a0ad;
+    }
 }
 
 @media (max-width: 980px) {

@@ -21,3 +21,11 @@ test(".nojekyll is present at the project root", async () => {
     const stats = await fs.stat(path.join(projectRoot, ".nojekyll"));
     assert.equal(stats.isFile(), true);
 });
+
+test("styles.css keeps compatibility fallbacks for older mobile browsers", async () => {
+    const css = await fs.readFile(path.join(projectRoot, "styles.css"), "utf8");
+
+    assert(css.includes("--bg: #f7f8fb;"));
+    assert(css.includes("@supports (color: oklch(0.5 0 0))"));
+    assert(css.includes("@supports not (background: color-mix(in srgb, black 50%, white))"));
+});

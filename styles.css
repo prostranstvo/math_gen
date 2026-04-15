@@ -590,6 +590,12 @@ a:focus-visible {
     align-items: end;
 }
 
+.sheet-heading {
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
 .sheet-corner {
     display: grid;
     gap: var(--space-3);
@@ -730,32 +736,25 @@ a:focus-visible {
 
 .problem-list {
     list-style: none;
+    display: grid;
+    gap: var(--space-4);
 }
 
 .problem-grid {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
 }
 
 .problem-row {
     display: grid;
-    gap: var(--space-3);
-    padding: var(--space-4) 0;
-    border-top: 1px solid var(--line);
-}
-
-.problem-row--grid {
+    grid-template-columns: minmax(0, 1fr) minmax(8rem, auto);
+    gap: var(--space-3) var(--space-4);
     padding: var(--space-4);
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--surface) 96%, white);
-}
-
-.problem-row:first-child {
-    border-top: 0;
-}
-
-.problem-row--grid:first-child {
-    border-top: 1px solid var(--line);
+    align-items: center;
 }
 
 .problem-row--valid {
@@ -770,14 +769,7 @@ a:focus-visible {
 .problem-stem {
     display: grid;
     gap: var(--space-2);
-}
-
-.problem-number {
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-soft);
+    align-content: start;
 }
 
 .problem-prompt {
@@ -791,12 +783,7 @@ a:focus-visible {
     flex-wrap: wrap;
     gap: var(--space-3);
     align-items: center;
-    justify-content: space-between;
-}
-
-.answer-label {
-    color: var(--text-soft);
-    font-weight: 600;
+    justify-content: flex-start;
 }
 
 .answer-input {
@@ -812,6 +799,11 @@ a:focus-visible {
 
 .field-note {
     font-size: 0.93rem;
+}
+
+.problem-row .field-note {
+    grid-column: 1 / -1;
+    margin: 0;
 }
 
 .spelling-practice {
@@ -846,6 +838,7 @@ a:focus-visible {
 .spelling-word {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 2.85rem;
     padding: 0.4rem 0.85rem;
     border-radius: 999px;
@@ -855,6 +848,18 @@ a:focus-visible {
     font-size: 1.18rem;
     font-weight: 700;
     letter-spacing: -0.02em;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.spelling-word:hover,
+.spelling-word:focus-visible,
+.game-word-chip:hover,
+.game-word-chip:focus-visible,
+.game-focus-word:hover,
+.game-focus-word:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(31, 36, 48, 0.08);
 }
 
 .spelling-attempts {
@@ -885,18 +890,10 @@ a:focus-visible {
     margin: 0;
 }
 
-.review-box,
 .text-entry {
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--surface) 96%, white);
-}
-
-.review-box {
-    min-height: 10rem;
-    padding: var(--space-4);
-    color: var(--text-soft);
-    line-height: 1.65;
 }
 
 .text-entry {
@@ -1114,6 +1111,8 @@ a:focus-visible {
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: -0.02em;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
 }
 
 .game-focus-word {
@@ -1130,6 +1129,8 @@ a:focus-visible {
     font-size: clamp(2rem, 5vw, 3.4rem);
     font-weight: 700;
     letter-spacing: -0.04em;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
 }
 
 .game-entry-stage {
@@ -1224,9 +1225,7 @@ a:focus-visible {
     }
 
     .history-item,
-    .problem-row--grid,
     .spelling-row,
-    .review-box,
     .text-entry,
     .task-row,
     .game-status,
@@ -1378,6 +1377,21 @@ a:focus-visible {
         width: min(100%, calc(100% - 1rem));
     }
 
+    .hero-copy-wrap {
+        gap: var(--space-3);
+    }
+
+    .hero-title {
+        font-size: clamp(4rem, 18vw, 6.35rem);
+        max-width: 6ch;
+        letter-spacing: -0.05em;
+    }
+
+    .hero-copy {
+        max-width: 24rem;
+        font-size: 1.02rem;
+    }
+
     .home-local-nav {
         position: static;
         border-radius: 1.25rem;
@@ -1389,19 +1403,51 @@ a:focus-visible {
 
     .saved-header,
     .saved-resume,
-    .sheet-topline,
     .sheet-controls,
     .toolbar {
         align-items: start;
         flex-direction: column;
     }
 
+    .sheet-topline {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: var(--space-3);
+        align-items: start;
+    }
+
+    .sheet-heading {
+        gap: var(--space-1);
+    }
+
     .sheet-corner {
-        justify-items: start;
+        align-self: stretch;
+        justify-items: end;
+        grid-template-rows: auto 1fr;
+        align-content: space-between;
     }
 
     .name-lines {
-        text-align: left;
+        align-self: end;
+        text-align: right;
+        font-size: 0.86rem;
+        gap: 0.35rem;
+    }
+
+    .sheet-title {
+        font-size: clamp(2rem, 9vw, 3rem);
+        max-width: 6.5ch;
+    }
+
+    .sheet-subtitle {
+        max-width: 15rem;
+        font-size: 0.92rem;
+        line-height: 1.45;
+    }
+
+    .sheet-badge {
+        justify-self: end;
+        padding-inline: 0.65rem;
+        font-size: 0.84rem;
     }
 
     .button,
@@ -1422,6 +1468,11 @@ a:focus-visible {
     }
 
     .spelling-row {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .problem-row {
         grid-template-columns: 1fr;
         align-items: start;
     }
@@ -1484,10 +1535,8 @@ a:focus-visible {
     }
 
     .problem-row,
-    .problem-row--grid,
     .task-row,
     .history-item,
-    .review-box,
     .text-entry,
     .text-entry-input,
     .spelling-row,

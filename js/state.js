@@ -221,9 +221,14 @@ function normalizeWorksheetPayload(payload) {
                 label: section.kind === "review" ? "Your ideas" : "Your draft",
                 minWords: section.kind === "review" ? 3 : 8,
                 placeholder: section.kind === "review" ? "List a few facts, ideas, or reminders here." : "Write your first draft here.",
-                rows: section.kind === "review" ? 5 : (section.lines || 8),
-                lined: section.kind === "writing"
+                rows: section.kind === "review" ? 7 : (section.lines || 8),
+                lined: section.kind === "review" || section.kind === "writing"
             };
+        }
+
+        if (section.kind === "review" && section.responseField) {
+            section.responseField.rows = Math.max(Number(section.responseField.rows) || 0, 7);
+            section.responseField.lined = true;
         }
 
         if (section.responseField && !(section.responseField.id in payload.responses.text)) {

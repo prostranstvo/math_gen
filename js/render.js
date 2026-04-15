@@ -85,7 +85,6 @@ function renderProblemRows(section, payload, validation, isGrid) {
                 const isValid = Boolean(validation && !isInvalid && currentValue.trim());
                 const rowClass = [
                     "problem-row",
-                    isGrid ? "problem-row--grid" : "",
                     isInvalid ? "problem-row--invalid" : "",
                     isValid ? "problem-row--valid" : ""
                 ].filter(Boolean).join(" ");
@@ -96,11 +95,11 @@ function renderProblemRows(section, payload, validation, isGrid) {
                 return `
                     <${rowTag} class="${rowClass}" data-answer-row="${escapeHtml(problem.id)}">
                         <div class="problem-stem">
-                            <span class="problem-number">Problem ${index + 1}</span>
+                            <span class="sr-only">Problem ${index + 1}</span>
                             <div class="problem-prompt">${escapeHtml(problem.prompt)}</div>
                         </div>
                         <div class="answer-wrap">
-                            <label class="answer-label" for="${escapeHtml(problem.id)}">Answer</label>
+                            <label class="sr-only" for="${escapeHtml(problem.id)}">Answer for problem ${index + 1}</label>
                             <input
                                 class="answer-input"
                                 id="${escapeHtml(problem.id)}"
@@ -137,7 +136,13 @@ function renderSpellingRows(section, payload, validation) {
                 return `
                     <div class="spelling-row ${rowInvalid ? "spelling-row--invalid" : ""} ${rowValid ? "spelling-row--valid" : ""}">
                         <div class="spelling-word-wrap">
-                            <span class="spelling-word">${escapeHtml(row.word)}</span>
+                            <button
+                                class="spelling-word"
+                                type="button"
+                                data-speak-text="${escapeHtml(row.word)}"
+                                aria-label="Hear ${escapeHtml(row.word)}"
+                                title="Hear ${escapeHtml(row.word)}"
+                            >${escapeHtml(row.word)}</button>
                         </div>
 
                         <div class="spelling-attempts">
@@ -226,8 +231,7 @@ function renderSection(section, payload, validation) {
             return `
                 <section class="section-sheet ${surfaceClass} ${pageBreakClass}">
                     ${sectionHeader}
-                    <div class="review-box">${escapeHtml(section.prompt)}</div>
-                    ${renderTextEntry(section.responseField, payload, validation, { label: "Your ideas" })}
+                    ${renderTextEntry(section.responseField, payload, validation, { label: "Your ideas", lined: true })}
                 </section>
             `;
         case "writing":
@@ -388,7 +392,7 @@ export function renderWorksheetView({ payload, validation }) {
                 </div>
 
                 <div class="sheet-topline">
-                    <div>
+                    <div class="sheet-heading">
                         <p class="eyebrow">${escapeHtml(navLabel)}</p>
                         <h1 class="sheet-title">${escapeHtml(payload.title)}</h1>
                         <p class="sheet-subtitle">${escapeHtml(payload.subtitle)}</p>
@@ -522,7 +526,15 @@ export function renderGameView({ payload }) {
                             <p class="eyebrow">Look quickly</p>
                             <h2 class="section-title">These are your 10 words.</h2>
                             <div class="game-word-grid">
-                                ${game.words.map((word) => `<span class="game-word-chip">${escapeHtml(word.word)}</span>`).join("")}
+                                ${game.words.map((word) => `
+                                    <button
+                                        class="game-word-chip"
+                                        type="button"
+                                        data-speak-text="${escapeHtml(word.word)}"
+                                        aria-label="Hear ${escapeHtml(word.word)}"
+                                        title="Hear ${escapeHtml(word.word)}"
+                                    >${escapeHtml(word.word)}</button>
+                                `).join("")}
                             </div>
                         </div>
                     ` : ""}
@@ -531,7 +543,13 @@ export function renderGameView({ payload }) {
                         <div class="game-card game-card--focus">
                             <p class="eyebrow">Look closely</p>
                             <h2 class="section-title">Remember this word.</h2>
-                            <div class="game-focus-word">${escapeHtml(currentWord.word)}</div>
+                            <button
+                                class="game-focus-word"
+                                type="button"
+                                data-speak-text="${escapeHtml(currentWord.word)}"
+                                aria-label="Hear ${escapeHtml(currentWord.word)}"
+                                title="Hear ${escapeHtml(currentWord.word)}"
+                            >${escapeHtml(currentWord.word)}</button>
                         </div>
                     ` : ""}
 

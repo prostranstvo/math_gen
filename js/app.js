@@ -27,6 +27,9 @@ const uiState = {
 };
 
 let gameTimerId = null;
+let preferredSpeechVoice = null;
+let lastSpokenWord = "";
+let lastSpokenAt = 0;
 
 function isSpellingTest(payload = uiState.activeWorksheet) {
     return Boolean(payload && payload.type === "spelling-test" && payload.game);
@@ -37,6 +40,64 @@ function clearGameTimer() {
         window.clearTimeout(gameTimerId);
         gameTimerId = null;
     }
+}
+
+function canSpeakText() {
+    return typeof window !== "undefined"
+        && "speechSynthesis" in window
+        && typeof window.SpeechSynthesisUtterance !== "undefined";
+}
+
+function resolveSpeechVoice() {
+    if (!canSpeakText()) {
+        return null;
+    }
+
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) {
+        return null;
+    }
+
+    if (preferredSpeechVoice && voices.some((voice) => voice.voiceURI === preferredSpeechVoice.voiceURI)) {
+        return preferredSpeechVoice;
+    }
+
+    preferredSpeechVoice = voices.find((voice) => /^en(-|_)/i.test(voice.lang) && /samantha|karen|ava|moira|siri|female/i.test(voice.name))
+        || voices.find((voice) => /^en(-|_)/i.test(voice.lang))
+        || voices[0];
+
+    return preferredSpeechVoice;
+}
+
+function speakText(text, options = {}) {
+    if (!canSpeakText()) {
+        return;
+    }
+
+    const normalizedText = String(text || "").trim();
+    if (!normalizedText) {
+        return;
+    }
+
+    const now = Date.now();
+    const isRecentRepeat = normalizedText.toLowerCase() === lastSpokenWord && (now - lastSpokenAt) < 800;
+    if (isRecentRepeat && !options.force) {
+        return;
+    }
+
+    lastSpokenWord = normalizedText.toLowerCase();
+    lastSpokenAt = now;
+
+    window.speechSynthesis.cancel();
+
+    const utterance = new window.SpeechSynthesisUtterance(normalizedText);
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    const voice = resolveSpeechVoice();
+    if (voice) {
+        utterance.voice = voice;
+    }
+    window.speechSynthesis.speak(utterance);
 }
 
 function syncGameDebugHooks() {
@@ -444,12 +505,35 @@ function handleAction(action) {
 }
 
 function handleClick(event) {
+    const speakTarget = event.target.closest("[data-speak-text]");
+    if (speakTarget) {
+        speakText(speakTarget.dataset.speakText, { force: true });
+    }
+
     const actionTarget = event.target.closest("[data-action]");
     if (!actionTarget) {
         return;
     }
 
     handleAction(actionTarget.dataset.action);
+}
+
+function handleMouseOver(event) {
+    const speakTarget = event.target.closest("[data-speak-text]");
+    if (!speakTarget || speakTarget.contains(event.relatedTarget)) {
+        return;
+    }
+
+    speakText(speakTarget.dataset.speakText);
+}
+
+function handleFocusIn(event) {
+    const speakTarget = event.target.closest("[data-speak-text]");
+    if (!speakTarget) {
+        return;
+    }
+
+    speakText(speakTarget.dataset.speakText);
 }
 
 function handleInput(event) {
@@ -524,9 +608,19 @@ function boot() {
     }
 
     app.addEventListener("click", handleClick);
+    app.addEventListener("mouseover", handleMouseOver);
+    app.addEventListener("focusin", handleFocusIn);
     app.addEventListener("input", handleInput);
     app.addEventListener("change", handleChange);
     app.addEventListener("submit", handleSubmit);
+
+    if (canSpeakText()) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.addEventListener?.("voiceschanged", () => {
+            preferredSpeechVoice = resolveSpeechVoice();
+        });
+    }
+
     renderApp();
 }
 

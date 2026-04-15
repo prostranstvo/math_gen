@@ -86,6 +86,8 @@ test("generateFullHomework stays week-specific and excludes generic extra practi
     assert(spellingSection.practiceRows.every((row) => row.entries.length === 3));
     assert.equal(Boolean(reviewSection.responseField), true);
     assert.equal(Boolean(writingSection.responseField), true);
+    assert.equal(reviewSection.responseField.lined, true);
+    assert.equal(reviewSection.responseField.rows, 7);
     assert.equal(Object.keys(payload.responses.tasks).length, 0);
     assert.equal(Object.keys(payload.responses.text).length, 2);
 });

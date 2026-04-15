@@ -39,8 +39,12 @@ test("worksheet view renders helper notes and section presentation metadata", ()
     assert(html.includes(`section-sheet--${payload.sections[0].surfaceVariant}`));
     assert(html.includes(payload.navLabel));
     assert(html.includes('class="spelling-practice"'));
+    assert(html.includes('data-speak-text='));
     assert(html.includes('data-text-id='));
+    assert(html.includes('class="problem-row"'));
+    assert(html.includes('text-entry-input--lined'));
     assert(html.includes("Your draft"));
+    assert(html.includes('class="review-box"') === false);
 });
 
 test("game view renders the timed spelling test layout", () => {
@@ -51,6 +55,12 @@ test("game view renders the timed spelling test layout", () => {
     assert(html.includes("Start Test"));
     assert(html.includes('data-game-form') === false);
     assert(html.includes("Ten random spelling words are chosen from across all weeks."));
+    assert(html.includes("If all 10 are right on the first try, you earn one bonus trophy."));
+
+    payload.game.phase = "preview-all";
+    const previewHtml = renderGameView({ payload });
+    assert(previewHtml.includes('class="game-word-chip"'));
+    assert(previewHtml.includes('data-speak-text='));
 
     payload.game.phase = "typing";
     payload.game.currentInput = "sample";

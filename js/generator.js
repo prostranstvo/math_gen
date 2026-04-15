@@ -761,7 +761,7 @@ export function generateSpellingTestGame() {
         completionLabel: "Spelling Test",
         helperNote: {
             title: "Look, remember, then type.",
-            copy: "You will see all 10 words for 3 seconds, then one word at a time. If a word is wrong, it comes back for 3 seconds before you try again.",
+            copy: "You will see all 10 words for 3 seconds, then one word at a time. Hover or tap a visible word to hear it. If a word is wrong, it comes back for 3 seconds before you try again.",
             actionLabel: "Start Test"
         },
         selectedWeekId: null
@@ -818,7 +818,7 @@ export function generateFullHomework(weekId) {
             stepLabel: "Step 1",
             surfaceVariant: "plain",
             title: "Part 1: Spelling and Foundations",
-            hint: "Write each word three times. Each spelling box checks automatically when it matches the word.",
+            hint: "Write each word three times. Hover or tap a word to hear it. Each spelling box checks automatically when it matches the word.",
             intro: week.grammar,
             practiceRows: week.spelling.map((word) => ({
                 word,
@@ -850,7 +850,8 @@ export function generateFullHomework(weekId) {
             responseField: builder.textField("Your ideas", {
                 minWords: 3,
                 placeholder: "List a few facts, ideas, or reminders here.",
-                rows: 5
+                rows: 7,
+                lined: true
             })
         },
         {

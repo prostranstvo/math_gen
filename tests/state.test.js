@@ -127,6 +127,10 @@ test("recordCompletion increments the shelf and caps history", () => {
     assert.equal(shelf.trophies, 14);
     assert.equal(shelf.history.length, 12);
     assert.equal(shelf.history[0].label, "Math Practice 14");
+    assert.equal(shelf.stats.completedPages, 14);
+    assert.equal(shelf.stats.completedPractice, 14);
+    assert.equal(shelf.stats.completedHomework, 0);
+    assert.equal(shelf.stats.completedTests, 0);
 });
 
 test("recordCompletion uses trophyPoints for perfect spelling rounds", () => {
@@ -146,5 +150,10 @@ test("recordCompletion uses trophyPoints for perfect spelling rounds", () => {
 
     assert.equal(result.trophyPoints, 2);
     assert.equal(result.details.bonusAwarded, true);
-    assert.equal(getProgressShelf(storage).trophies, 2);
+    const shelf = getProgressShelf(storage);
+
+    assert.equal(shelf.trophies, 2);
+    assert.equal(shelf.stats.completedPages, 0);
+    assert.equal(shelf.stats.completedTests, 1);
+    assert.equal(shelf.stats.perfectSpellingRounds, 1);
 });

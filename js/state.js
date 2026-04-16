@@ -1,8 +1,54 @@
 const STORAGE_KEYS = Object.freeze({
     activeWorksheet: "mathGenActiveWorksheet",
     trophies: "mathGenTrophyCount",
-    history: "mathGenCompletionHistory"
+    history: "mathGenCompletionHistory",
+    stats: "mathGenProgressStats"
 });
+
+function createDefaultProgressStats() {
+    return {
+        completedPages: 0,
+        completedHomework: 0,
+        completedPractice: 0,
+        completedTests: 0,
+        perfectSpellingRounds: 0
+    };
+}
+
+function normalizeProgressStats(stats, history = []) {
+    const defaults = createDefaultProgressStats();
+
+    if (!stats || typeof stats !== "object") {
+        return history.reduce((accumulator, entry) => {
+            if (entry?.type === "full-homework") {
+                accumulator.completedPages += 1;
+                accumulator.completedHomework += 1;
+            }
+
+            if (entry?.type === "math-practice") {
+                accumulator.completedPages += 1;
+                accumulator.completedPractice += 1;
+            }
+
+            if (entry?.type === "spelling-test") {
+                accumulator.completedTests += 1;
+                if (/perfect round/i.test(String(entry.label || ""))) {
+                    accumulator.perfectSpellingRounds += 1;
+                }
+            }
+
+            return accumulator;
+        }, defaults);
+    }
+
+    return {
+        completedPages: Number(stats.completedPages) || 0,
+        completedHomework: Number(stats.completedHomework) || 0,
+        completedPractice: Number(stats.completedPractice) || 0,
+        completedTests: Number(stats.completedTests) || 0,
+        perfectSpellingRounds: Number(stats.perfectSpellingRounds) || 0
+    };
+}
 
 /**
  * @typedef {Object} CompletionEntry
@@ -376,9 +422,12 @@ export function validateWorksheet(payload) {
 }
 
 export function getProgressShelf(storage = getLocalStorage()) {
+    const history = readJson(storage, STORAGE_KEYS.history, []);
+
     return {
         trophies: Number(readJson(storage, STORAGE_KEYS.trophies, 0)) || 0,
-        history: readJson(storage, STORAGE_KEYS.history, [])
+        history,
+        stats: normalizeProgressStats(readJson(storage, STORAGE_KEYS.stats, null), history)
     };
 }
 
@@ -419,15 +468,38 @@ export function recordCompletion(payload, storage = getLocalStorage()) {
     const trophyPoints = Number(payload.trophyPoints) > 0 ? Number(payload.trophyPoints) : 1;
     const trophies = shelf.trophies + trophyPoints;
     const history = [entry, ...shelf.history].slice(0, 12);
+    const stats = {
+        ...shelf.stats
+    };
+
+    if (payload.type === "full-homework") {
+        stats.completedPages += 1;
+        stats.completedHomework += 1;
+    }
+
+    if (payload.type === "math-practice") {
+        stats.completedPages += 1;
+        stats.completedPractice += 1;
+    }
+
+    if (payload.type === "spelling-test") {
+        stats.completedTests += 1;
+
+        if (payload.completionDetails?.bonusAwarded) {
+            stats.perfectSpellingRounds += 1;
+        }
+    }
 
     writeJson(storage, STORAGE_KEYS.trophies, trophies);
     writeJson(storage, STORAGE_KEYS.history, history);
+    writeJson(storage, STORAGE_KEYS.stats, stats);
 
     return {
         entry,
         trophies,
         history,
         trophyPoints,
-        details: payload.completionDetails || null
+        details: payload.completionDetails || null,
+        stats
     };
 }

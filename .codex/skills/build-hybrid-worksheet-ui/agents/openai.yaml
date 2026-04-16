@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Hybrid Worksheet UI"
+  short_description: "Build MathGen worksheets for screen and print."
+  default_prompt: "Use this skill to build or refine MathGen worksheet interactions, validation, print behavior, and saved progress for both digital and printable use."

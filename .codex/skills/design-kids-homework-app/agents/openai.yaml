@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Kids Homework App"
+  short_description: "Shape MathGen screens for a calm, child-friendly homework feel."
+  default_prompt: "Use this skill to design or refine MathGen screens for a 10-year-old homework experience while preserving the repo’s calm, premium tone."

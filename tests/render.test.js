@@ -6,32 +6,52 @@ import { swanseaWeeks } from "../data/swansea-weeks.js";
 import { generateFullHomework, generateSpellingTestGame } from "../js/generator.js";
 import { renderGameView, renderHomeView, renderWorksheetView } from "../js/render.js";
 
-test("home view renders the local nav, choose section, and why section", () => {
+test("home view renders the local nav, choose section, smart thinking, and proud board", () => {
     const html = renderHomeView({
         content: homeContent,
         weeks: swanseaWeeks,
         selectedWeekId: "10",
         progress: {
             trophies: 2,
-            history: []
+            history: [],
+            stats: {
+                completedPages: 4,
+                perfectSpellingRounds: 1
+            }
         },
         activeWorksheet: null
     });
 
     assert(html.includes('class="home-local-nav no-print"'));
     assert(html.includes('href="#choose"'));
-    assert(html.includes('id="why"'));
+    assert(html.includes('href="#smart"'));
+    assert(html.includes('href="#proud"'));
+    assert(html.includes("Week 10 is ready."));
     assert(html.includes("Open Week 10"));
+    assert(html.includes('class="hero-preview hero-preview--primary" type="button" data-action="generate-full"'));
+    assert(html.includes('class="hero-preview hero-preview--secondary" type="button" data-action="generate-math"'));
+    assert(html.includes('class="hero-preview hero-preview--tertiary" type="button" data-action="generate-test"'));
+    assert(html.includes("This Week"));
     assert(html.includes(homeContent.modules.test.title));
     assert(html.includes(homeContent.modules.test.ctaLabel));
-    assert(html.includes(homeContent.why.items[0].title));
+    assert(html.includes('id="smart"'));
+    assert(html.includes(homeContent.smartThinking.items[0].title));
+    assert(html.includes('id="proud"'));
+    assert(html.includes(homeContent.proudBoard.title));
+    assert(html.includes("Pages Finished"));
+    assert(html.includes("Perfect Tests"));
+    assert(html.includes('id="why"') === false);
 });
 
 test("worksheet view renders helper notes and section presentation metadata", () => {
     const payload = generateFullHomework("10");
+    const checkedAnswerId = payload.sections[1].problems[0].id;
     const html = renderWorksheetView({
         payload,
-        validation: null
+        validation: null,
+        liveAnswerFeedback: {
+            [checkedAnswerId]: true
+        }
     });
 
     assert(html.includes(payload.helperNote.title));
@@ -43,6 +63,7 @@ test("worksheet view renders helper notes and section presentation metadata", ()
     assert(html.includes('data-text-id='));
     assert(html.includes('class="problem-row"'));
     assert(html.includes('text-entry-input--lined'));
+    assert(html.includes("answer-input--checked"));
     assert(html.includes("Your draft"));
     assert(html.includes('class="review-box"') === false);
 });
@@ -53,9 +74,12 @@ test("game view renders the timed spelling test layout", () => {
 
     assert(html.includes(payload.helperNote.title));
     assert(html.includes("Start Test"));
+    assert.equal((html.match(/Start Test/g) || []).length, 2);
     assert(html.includes('data-game-form') === false);
-    assert(html.includes("Ten random spelling words are chosen from across all weeks."));
-    assert(html.includes("If all 10 are right on the first try, you earn one bonus trophy."));
+    assert(html.includes("Perfect round = +1 trophy"));
+    assert(html.includes('class="game-card-actions no-print"'));
+    assert(html.includes('class="game-rule-chip"'));
+    assert(html.includes("Ten random spelling words are chosen from across all weeks.") === false);
 
     payload.game.phase = "preview-all";
     const previewHtml = renderGameView({ payload });

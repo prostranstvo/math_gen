@@ -1,0 +1,4 @@
+interface:
+  display_name: "Import Weekly School PDFs"
+  short_description: "Turn new school PDF packets into MathGen week data."
+  default_prompt: "Use this skill when new weekly school PDFs arrive for MathGen and you need to extract, review, and merge them into the project’s structured week data."

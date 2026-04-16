@@ -276,6 +276,9 @@ a:focus-visible {
 
 .hero-preview {
     position: absolute;
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
     width: min(100%, 17rem);
     padding: var(--space-5);
     border-radius: 2.15rem;
@@ -285,7 +288,25 @@ a:focus-visible {
         0 26px 64px color-mix(in srgb, var(--text) 9%, transparent),
         0 10px 28px color-mix(in srgb, var(--text) 5%, transparent),
         0 0 34px color-mix(in srgb, white 68%, transparent);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    appearance: none;
     will-change: transform;
+}
+
+.hero-preview:hover,
+.hero-preview:focus-visible {
+    animation-play-state: paused;
+    box-shadow:
+        0 30px 72px color-mix(in srgb, var(--text) 11%, transparent),
+        0 12px 32px color-mix(in srgb, var(--text) 7%, transparent),
+        0 0 34px color-mix(in srgb, white 68%, transparent);
+}
+
+.hero-preview:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--accent-soft) 80%, white);
+    outline-offset: 4px;
 }
 
 .hero-preview strong,
@@ -347,6 +368,20 @@ a:focus-visible {
     animation: hero-float-tertiary 6.8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
 }
 
+.hero-preview-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    margin-top: auto;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface-band) 74%, white);
+    color: var(--text-soft);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
 .home-section {
     display: grid;
     gap: var(--space-5);
@@ -385,7 +420,7 @@ a:focus-visible {
 
 .product-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(16rem, 0.9fr) minmax(16rem, 0.9fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-4);
 }
 
@@ -418,6 +453,11 @@ a:focus-visible {
     border-top: 1px solid var(--line);
 }
 
+.product-actions {
+    display: flex;
+    margin-top: auto;
+}
+
 .select-wrap {
     display: grid;
     gap: var(--space-2);
@@ -440,17 +480,21 @@ a:focus-visible {
     appearance: none;
 }
 
-.reason-grid {
+.reason-grid,
+.smart-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-4);
 }
 
-.reason-tile {
+.reason-tile,
+.smart-tile {
     display: grid;
     gap: var(--space-3);
-    padding: var(--space-5) 0 0;
-    border-top: 1px solid var(--line);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+    background: var(--surface);
 }
 
 .saved-header {
@@ -495,6 +539,10 @@ a:focus-visible {
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
 }
 
+.history-list--proud {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
 .history-item {
     padding: var(--space-4);
     border-radius: var(--radius-md);
@@ -511,6 +559,46 @@ a:focus-visible {
     margin-top: var(--space-2);
     color: var(--text-soft);
     font-size: 0.92rem;
+}
+
+.summary-strip--proud {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding-top: 0;
+    border-top: 0;
+}
+
+.summary-strip--proud .summary-item {
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.proud-resume {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.proud-resume strong {
+    display: block;
+    margin-bottom: var(--space-1);
+    font-size: 1.05rem;
+}
+
+.proud-history {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.proud-history-title {
+    font-size: 1rem;
+    letter-spacing: -0.01em;
 }
 
 .button {
@@ -761,6 +849,10 @@ a:focus-visible {
     background: color-mix(in srgb, var(--success-soft) 72%, white);
 }
 
+.problem-row--checked {
+    background: color-mix(in srgb, var(--success-soft) 72%, white);
+}
+
 .problem-row--invalid,
 .task-row--invalid {
     background: color-mix(in srgb, var(--danger-soft) 70%, white);
@@ -784,6 +876,21 @@ a:focus-visible {
     gap: var(--space-3);
     align-items: center;
     justify-content: flex-start;
+    position: relative;
+}
+
+.answer-wrap--checked::after {
+    content: "✓";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    border-radius: 999px;
+    background: var(--success);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 700;
 }
 
 .answer-input {
@@ -795,6 +902,11 @@ a:focus-visible {
     background: var(--surface);
     color: var(--text);
     text-align: center;
+}
+
+.answer-input--checked {
+    border-color: var(--success);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--success-soft) 48%, white);
 }
 
 .field-note {
@@ -823,6 +935,10 @@ a:focus-visible {
 }
 
 .spelling-row--valid {
+    background: color-mix(in srgb, var(--success-soft) 72%, white);
+}
+
+.spelling-row--checked {
     background: color-mix(in srgb, var(--success-soft) 72%, white);
 }
 
@@ -870,6 +986,7 @@ a:focus-visible {
 
 .spelling-attempt {
     display: block;
+    position: relative;
 }
 
 .spelling-attempt--invalid {
@@ -880,9 +997,22 @@ a:focus-visible {
     background: color-mix(in srgb, var(--success-soft) 45%, transparent);
 }
 
+.spelling-attempt--checked::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    right: 0.85rem;
+    transform: translateY(-50%);
+    color: var(--success);
+    font-size: 1rem;
+    font-weight: 700;
+    pointer-events: none;
+}
+
 .spelling-input {
     width: 100%;
     text-align: left;
+    padding-right: 2.35rem;
 }
 
 .spelling-row .field-note {
@@ -1083,13 +1213,32 @@ a:focus-visible {
     max-width: 36rem;
 }
 
-.game-rule-list {
-    display: grid;
-    gap: var(--space-3);
-    margin: 0;
-    padding-left: 1.15rem;
+.game-rule-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.game-rule-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.35rem;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
     color: var(--text-soft);
-    line-height: 1.6;
+    font-size: 0.94rem;
+    font-weight: 600;
+}
+
+.game-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
 }
 
 .game-word-grid {
@@ -1280,7 +1429,9 @@ a:focus-visible {
     }
 
     .problem-row--valid,
+    .problem-row--checked,
     .spelling-row--valid,
+    .spelling-row--checked,
     .text-entry--valid,
     .game-status--success {
         background: #eef8f1;
@@ -1305,6 +1456,10 @@ a:focus-visible {
 
     .spelling-attempt--valid {
         background: rgba(76, 165, 109, 0.12);
+    }
+
+    .answer-input--checked {
+        box-shadow: 0 0 0 3px rgba(76, 165, 109, 0.22);
     }
 
     .text-entry-input--lined {
@@ -1341,6 +1496,7 @@ a:focus-visible {
     .hero-layout,
     .product-grid,
     .reason-grid,
+    .smart-grid,
     .summary-strip,
     .problem-grid {
         grid-template-columns: 1fr;
@@ -1403,6 +1559,7 @@ a:focus-visible {
 
     .saved-header,
     .saved-resume,
+    .proud-resume,
     .sheet-controls,
     .toolbar {
         align-items: start;
@@ -1478,7 +1635,8 @@ a:focus-visible {
     }
 
     .spelling-attempts,
-    .history-list--saved {
+    .history-list--saved,
+    .history-list--proud {
         grid-template-columns: 1fr;
     }
 }

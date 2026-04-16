@@ -72,7 +72,7 @@ function getTextFieldNote(field) {
     return "Write something here before you finish the page.";
 }
 
-function renderProblemRows(section, payload, validation, isGrid) {
+function renderProblemRows(section, payload, validation, isGrid, liveAnswerFeedback = {}) {
     const wrapperTag = isGrid ? "div" : "ol";
     const rowTag = isGrid ? "div" : "li";
     const wrapperClass = isGrid ? "problem-grid" : "problem-list";
@@ -83,8 +83,10 @@ function renderProblemRows(section, payload, validation, isGrid) {
                 const currentValue = payload.responses.answers[problem.id] || "";
                 const isInvalid = Boolean(validation && validation.invalidAnswerIds.includes(problem.id));
                 const isValid = Boolean(validation && !isInvalid && currentValue.trim());
+                const isChecked = Boolean(liveAnswerFeedback[problem.id]);
                 const rowClass = [
                     "problem-row",
+                    isChecked ? "problem-row--checked" : "",
                     isInvalid ? "problem-row--invalid" : "",
                     isValid ? "problem-row--valid" : ""
                 ].filter(Boolean).join(" ");
@@ -98,10 +100,10 @@ function renderProblemRows(section, payload, validation, isGrid) {
                             <span class="sr-only">Problem ${index + 1}</span>
                             <div class="problem-prompt">${escapeHtml(problem.prompt)}</div>
                         </div>
-                        <div class="answer-wrap">
+                        <div class="answer-wrap ${isChecked ? "answer-wrap--checked" : ""}">
                             <label class="sr-only" for="${escapeHtml(problem.id)}">Answer for problem ${index + 1}</label>
                             <input
-                                class="answer-input"
+                                class="answer-input ${isChecked ? "answer-input--checked" : ""}"
                                 id="${escapeHtml(problem.id)}"
                                 type="text"
                                 inputmode="${escapeHtml(problem.inputMode)}"
@@ -119,7 +121,7 @@ function renderProblemRows(section, payload, validation, isGrid) {
     `;
 }
 
-function renderSpellingRows(section, payload, validation) {
+function renderSpellingRows(section, payload, validation, liveAnswerFeedback = {}) {
     return `
         <div class="spelling-practice">
             ${section.practiceRows.map((row) => {
@@ -131,10 +133,11 @@ function renderSpellingRows(section, payload, validation) {
                         return value.trim() && !validation.invalidSpellingIds.includes(entry.id);
                     })
                 );
+                const rowChecked = row.entries.every((entry) => Boolean(liveAnswerFeedback[entry.id]));
                 const rowNoteId = `${row.entries[0].id}-note`;
 
                 return `
-                    <div class="spelling-row ${rowInvalid ? "spelling-row--invalid" : ""} ${rowValid ? "spelling-row--valid" : ""}">
+                    <div class="spelling-row ${rowInvalid ? "spelling-row--invalid" : ""} ${rowValid ? "spelling-row--valid" : ""} ${rowChecked ? "spelling-row--checked" : ""}">
                         <div class="spelling-word-wrap">
                             <button
                                 class="spelling-word"
@@ -150,12 +153,13 @@ function renderSpellingRows(section, payload, validation) {
                                 const currentValue = payload.responses.answers[entry.id] || "";
                                 const isInvalid = Boolean(validation && validation.invalidSpellingIds.includes(entry.id));
                                 const isValid = Boolean(validation && !isInvalid && currentValue.trim());
+                                const isChecked = Boolean(liveAnswerFeedback[entry.id]);
 
                                 return `
-                                    <div class="spelling-attempt ${isInvalid ? "spelling-attempt--invalid" : ""} ${isValid ? "spelling-attempt--valid" : ""}" data-answer-row="${escapeHtml(entry.id)}">
+                                    <div class="spelling-attempt ${isInvalid ? "spelling-attempt--invalid" : ""} ${isValid ? "spelling-attempt--valid" : ""} ${isChecked ? "spelling-attempt--checked" : ""}" data-answer-row="${escapeHtml(entry.id)}">
                                         <label class="sr-only" for="${escapeHtml(entry.id)}">${escapeHtml(row.word)} attempt ${attemptIndex + 1}</label>
                                         <input
-                                            class="answer-input spelling-input"
+                                            class="answer-input spelling-input ${isChecked ? "answer-input--checked" : ""}"
                                             id="${escapeHtml(entry.id)}"
                                             type="text"
                                             inputmode="text"
@@ -200,7 +204,7 @@ function renderTextEntry(field, payload, validation, options = {}) {
     `;
 }
 
-function renderSection(section, payload, validation) {
+function renderSection(section, payload, validation, liveAnswerFeedback) {
     const pageBreakClass = section.pageBreakBefore ? "page-break-before" : "";
     const surfaceClass = section.surfaceVariant ? `section-sheet--${section.surfaceVariant}` : "";
     const sectionHeader = `
@@ -217,14 +221,14 @@ function renderSection(section, payload, validation) {
             return `
                 <section class="section-sheet ${surfaceClass} ${pageBreakClass}">
                     ${sectionHeader}
-                    ${renderProblemRows(section, payload, validation, section.layout === "grid")}
+                    ${renderProblemRows(section, payload, validation, section.layout === "grid", liveAnswerFeedback)}
                 </section>
             `;
         case "spelling":
             return `
                 <section class="section-sheet ${surfaceClass} ${pageBreakClass}">
                     ${sectionHeader}
-                    ${renderSpellingRows(section, payload, validation)}
+                    ${renderSpellingRows(section, payload, validation, liveAnswerFeedback)}
                 </section>
             `;
         case "review":
@@ -248,7 +252,14 @@ function renderSection(section, payload, validation) {
 
 export function renderHomeView({ content, weeks, selectedWeekId, progress, activeWorksheet }) {
     const selectedWeek = weeks[selectedWeekId] || weeks[Object.keys(weeks).at(-1)];
-    const resumeLabel = activeWorksheet?.type === "spelling-test" ? "Resume this test" : content.saved.resumeLabel;
+    const resumeLabel = activeWorksheet?.type === "spelling-test" ? "Resume this test" : content.proudBoard.resumeLabel;
+    const stats = progress.stats || {
+        completedPages: 0,
+        perfectSpellingRounds: 0
+    };
+    const activeLabel = activeWorksheet?.type === "full-homework"
+        ? `Week ${activeWorksheet.selectedWeekId || selectedWeek.weekId}`
+        : activeWorksheet?.displayLabel || activeWorksheet?.completionLabel || "";
 
     return `
         <div class="page-shell home-shell">
@@ -259,29 +270,32 @@ export function renderHomeView({ content, weeks, selectedWeekId, progress, activ
                     <div class="hero-copy-wrap">
                         <p class="eyebrow">${escapeHtml(content.hero.eyebrow)}</p>
                         <h1 class="hero-title">${escapeHtml(content.hero.title)}</h1>
-                        <p class="hero-copy">${escapeHtml(content.hero.copy)}</p>
+                        <p class="hero-copy">Week ${escapeHtml(selectedWeek.weekId)} ${escapeHtml(content.hero.readyLabel)}</p>
                         <div class="hero-actions no-print">
                             <button class="button button--primary" type="button" data-action="generate-full">Open Week ${escapeHtml(selectedWeek.weekId)}</button>
                             <a class="button button--link" href="#choose">${escapeHtml(content.hero.secondaryActionLabel)}</a>
                         </div>
                     </div>
 
-                    <div class="hero-stage" aria-hidden="true">
-                        <div class="hero-preview hero-preview--primary">
+                    <div class="hero-stage">
+                        <button class="hero-preview hero-preview--primary" type="button" data-action="generate-full" aria-label="Open Week ${escapeHtml(selectedWeek.weekId)}">
                             <span class="preview-kicker">${escapeHtml(content.modules.homework.kicker)}</span>
                             <strong>Week ${escapeHtml(selectedWeek.weekId)}</strong>
                             <p>${escapeHtml(content.modules.homework.preview)}</p>
-                        </div>
-                        <div class="hero-preview hero-preview--secondary">
+                            <span class="hero-preview-icon" aria-hidden="true">↗</span>
+                        </button>
+                        <button class="hero-preview hero-preview--secondary" type="button" data-action="generate-math" aria-label="${escapeHtml(content.modules.practice.ctaLabel)}">
                             <span class="preview-kicker">${escapeHtml(content.modules.practice.kicker)}</span>
                             <strong>${escapeHtml(content.modules.practice.title)}</strong>
                             <p>${escapeHtml(content.modules.practice.preview)}</p>
-                        </div>
-                        <div class="hero-preview hero-preview--tertiary">
+                            <span class="hero-preview-icon" aria-hidden="true">↗</span>
+                        </button>
+                        <button class="hero-preview hero-preview--tertiary" type="button" data-action="generate-test" aria-label="${escapeHtml(content.modules.test.ctaLabel)}">
                             <span class="preview-kicker">${escapeHtml(content.modules.test.kicker)}</span>
                             <strong>${escapeHtml(content.modules.test.title)}</strong>
                             <p>${escapeHtml(content.modules.test.preview)}</p>
-                        </div>
+                            <span class="hero-preview-icon" aria-hidden="true">↗</span>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -290,7 +304,6 @@ export function renderHomeView({ content, weeks, selectedWeekId, progress, activ
                 <div class="section-intro">
                     <p class="eyebrow">${escapeHtml(content.choose.eyebrow)}</p>
                     <h2 class="panel-title">${escapeHtml(content.choose.title)}</h2>
-                    <p class="panel-copy">${escapeHtml(content.choose.copy)}</p>
                 </div>
 
                 <div class="product-grid">
@@ -308,38 +321,40 @@ export function renderHomeView({ content, weeks, selectedWeekId, progress, activ
                                 `).join("")}
                             </select>
                         </div>
-                        <div class="product-footnote">${escapeHtml(content.modules.homework.dynamicFootnotePrefix)} ${escapeHtml(selectedWeek.writingTopic)}</div>
-                        <button class="button button--primary" type="button" data-action="generate-full">Open Week ${escapeHtml(selectedWeek.weekId)}</button>
+                        <div class="product-actions">
+                            <button class="button button--primary" type="button" data-action="generate-full">Open Week ${escapeHtml(selectedWeek.weekId)}</button>
+                        </div>
                     </article>
 
                     <article class="product-panel product-panel--secondary">
                         <span class="product-kicker">${escapeHtml(content.modules.practice.kicker)}</span>
                         <h3>${escapeHtml(content.modules.practice.title)}</h3>
                         <p>${escapeHtml(content.modules.practice.copy)}</p>
-                        <div class="product-footnote">${escapeHtml(content.modules.practice.footnote)}</div>
-                        <button class="button button--secondary" type="button" data-action="generate-math">${escapeHtml(content.modules.practice.ctaLabel)}</button>
+                        <div class="product-actions">
+                            <button class="button button--secondary" type="button" data-action="generate-math">${escapeHtml(content.modules.practice.ctaLabel)}</button>
+                        </div>
                     </article>
 
                     <article class="product-panel product-panel--tertiary">
                         <span class="product-kicker">${escapeHtml(content.modules.test.kicker)}</span>
                         <h3>${escapeHtml(content.modules.test.title)}</h3>
                         <p>${escapeHtml(content.modules.test.copy)}</p>
-                        <div class="product-footnote">${escapeHtml(content.modules.test.footnote)}</div>
-                        <button class="button button--tertiary" type="button" data-action="generate-test">${escapeHtml(content.modules.test.ctaLabel)}</button>
+                        <div class="product-actions">
+                            <button class="button button--tertiary" type="button" data-action="generate-test">${escapeHtml(content.modules.test.ctaLabel)}</button>
+                        </div>
                     </article>
                 </div>
             </section>
 
-            <section id="why" class="home-section home-section--band">
+            <section id="smart" class="home-section home-section--band">
                 <div class="section-intro section-intro--compact">
-                    <p class="eyebrow">${escapeHtml(content.why.eyebrow)}</p>
-                    <h2 class="panel-title">${escapeHtml(content.why.title)}</h2>
-                    <p class="panel-copy">${escapeHtml(content.why.copy)}</p>
+                    <p class="eyebrow">${escapeHtml(content.smartThinking.eyebrow)}</p>
+                    <h2 class="panel-title">${escapeHtml(content.smartThinking.title)}</h2>
                 </div>
 
-                <div class="reason-grid">
-                    ${content.why.items.map((item) => `
-                        <article class="reason-tile">
+                <div class="smart-grid">
+                    ${content.smartThinking.items.map((item) => `
+                        <article class="smart-tile">
                             <h3>${escapeHtml(item.title)}</h3>
                             <p>${escapeHtml(item.copy)}</p>
                         </article>
@@ -347,33 +362,48 @@ export function renderHomeView({ content, weeks, selectedWeekId, progress, activ
                 </div>
             </section>
 
-            <section id="saved" class="home-section home-section--band home-section--saved">
-                <div class="saved-header">
-                    <div>
-                        <p class="eyebrow">${escapeHtml(content.saved.eyebrow)}</p>
-                        <h2 class="panel-title">${escapeHtml(content.saved.title)}</h2>
-                        <p class="panel-copy">${escapeHtml(content.saved.copy)}</p>
+            <section id="proud" class="home-section home-section--band home-section--proud">
+                <div class="section-intro section-intro--compact">
+                    <p class="eyebrow">${escapeHtml(content.proudBoard.eyebrow)}</p>
+                    <h2 class="panel-title">${escapeHtml(content.proudBoard.title)}</h2>
+                    <p class="panel-copy">${escapeHtml(content.proudBoard.copy)}</p>
+                </div>
+
+                <div class="summary-strip summary-strip--proud">
+                    <div class="summary-item">
+                        <span>${escapeHtml(content.proudBoard.stats[0].label)}</span>
+                        <strong>${progress.trophies}</strong>
                     </div>
-                    <div class="saved-total">${progress.trophies} ${progress.trophies === 1 ? "trophy earned here" : "trophies earned here"}</div>
+                    <div class="summary-item">
+                        <span>${escapeHtml(content.proudBoard.stats[1].label)}</span>
+                        <strong>${stats.completedPages}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>${escapeHtml(content.proudBoard.stats[2].label)}</span>
+                        <strong>${stats.perfectSpellingRounds}</strong>
+                    </div>
                 </div>
 
                 ${activeWorksheet ? `
-                    <div class="saved-resume no-print">
+                    <div class="proud-resume no-print">
                         <div>
-                            <strong>${escapeHtml(content.saved.resumeTitle)}</strong>
-                            <p>${escapeHtml(activeWorksheet.displayLabel || activeWorksheet.completionLabel)} is still ready to open again.</p>
+                            <strong>${escapeHtml(content.proudBoard.resumeTitle)}</strong>
+                            <p>${escapeHtml(activeLabel)} is waiting for you.</p>
                         </div>
                         <button class="button button--ghost" type="button" data-action="resume-active">${escapeHtml(resumeLabel)}</button>
                     </div>
                 ` : ""}
 
-                ${renderHistoryList(progress.history.slice(0, 5), content.saved.emptyMessage, "history-list--saved")}
+                <div class="proud-history">
+                    <strong class="proud-history-title">${escapeHtml(content.proudBoard.historyTitle)}</strong>
+                    ${renderHistoryList(progress.history.slice(0, 5), content.proudBoard.emptyMessage, "history-list--proud")}
+                </div>
             </section>
         </div>
     `;
 }
 
-export function renderWorksheetView({ payload, validation }) {
+export function renderWorksheetView({ payload, validation, liveAnswerFeedback = {} }) {
     const navLabel = payload.navLabel || (payload.type === "math-practice" ? "Practice" : "Homework");
     const helperNote = payload.helperNote || {
         title: payload.type === "math-practice" ? "Work one section at a time." : "Finish the math, then complete the spelling, review, and writing boxes.",
@@ -424,7 +454,7 @@ export function renderWorksheetView({ payload, validation }) {
             </div>
 
             <main class="worksheet-sections">
-                ${payload.sections.map((section) => renderSection(section, payload, validation)).join("")}
+                ${payload.sections.map((section) => renderSection(section, payload, validation, liveAnswerFeedback)).join("")}
             </main>
         </div>
     `;
@@ -504,20 +534,24 @@ export function renderGameView({ payload }) {
                     </div>
 
                     <section class="game-status ${statusToneClass}" aria-live="polite">
-                        <p class="eyebrow">Round status</p>
+                        <p class="eyebrow">Now</p>
                         <strong>${isReady ? "Ready when you are." : `Word ${Math.min(game.currentIndex + 1, game.words.length)} of ${game.words.length}`}</strong>
                         <p>${escapeHtml(game.feedback?.message || "Look closely, then type from memory.")}</p>
                     </section>
 
                     ${isReady ? `
                         <div class="game-card game-card--intro">
-                            <h2 class="section-title">A short spelling memory round.</h2>
-                            <p class="panel-copy">You will see all 10 words for 3 seconds. After that, each word shows by itself for 3 seconds, then disappears until you type it correctly.</p>
-                            <ul class="game-rule-list">
-                                <li>Ten random spelling words are chosen from across all weeks.</li>
-                                <li>Each word moves on only after it is typed correctly.</li>
-                                <li>If all 10 are right on the first try, you earn one bonus trophy.</li>
-                            </ul>
+                            <h2 class="section-title">Spelling memory round.</h2>
+                            <div class="game-rule-chips">
+                                <span class="game-rule-chip">10 words</span>
+                                <span class="game-rule-chip">3 seconds to look</span>
+                                <span class="game-rule-chip">Type from memory</span>
+                                <span class="game-rule-chip">Perfect round = +1 trophy</span>
+                            </div>
+                            <div class="game-card-actions no-print">
+                                <button class="button button--ghost" type="button" data-action="restart-spelling-test">Pick New Words</button>
+                                <button class="button button--tertiary" type="button" data-action="start-spelling-test">Start Test</button>
+                            </div>
                         </div>
                     ` : ""}
 

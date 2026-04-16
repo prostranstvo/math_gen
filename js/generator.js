@@ -756,12 +756,12 @@ export function generateSpellingTestGame() {
         navLabel: "Test",
         displayLabel: "Test Yourself",
         title: "Test Yourself",
-        subtitle: "Ten spelling words. Three seconds to look. Then type each one from memory.",
+        subtitle: "10 spelling words. Look, remember, type.",
         accent: "game",
         completionLabel: "Spelling Test",
         helperNote: {
-            title: "Look, remember, then type.",
-            copy: "You will see all 10 words for 3 seconds, then one word at a time. Hover or tap a visible word to hear it. If a word is wrong, it comes back for 3 seconds before you try again.",
+            title: "Look. Remember. Type.",
+            copy: "10 words. 3 seconds to look. Then type.",
             actionLabel: "Start Test"
         },
         selectedWeekId: null
@@ -775,7 +775,7 @@ export function generateSpellingTestGame() {
         currentInput: "",
         feedback: {
             tone: "neutral",
-            message: "See all 10 words, then type them one by one from memory."
+            message: "10 words. Then type from memory."
         },
         words: words.map((word, index) => ({
             id: `${payload.id}-word-${index + 1}`,

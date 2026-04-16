@@ -23,7 +23,8 @@ const uiState = {
     activeWorksheet: null,
     validation: null,
     completionData: null,
-    pendingFocus: null
+    pendingFocus: null,
+    liveAnswerFeedback: {}
 };
 
 let gameTimerId = null;
@@ -153,7 +154,8 @@ function renderApp() {
     if (uiState.view === "worksheet" && uiState.activeWorksheet) {
         markup = renderWorksheetView({
             payload: uiState.activeWorksheet,
-            validation: uiState.validation
+            validation: uiState.validation,
+            liveAnswerFeedback: uiState.liveAnswerFeedback
         });
     } else if (uiState.view === "game" && isSpellingTest()) {
         markup = renderGameView({
@@ -214,6 +216,7 @@ function openWorksheet(payload) {
     uiState.activeWorksheet = payload;
     uiState.validation = null;
     uiState.completionData = null;
+    uiState.liveAnswerFeedback = {};
     uiState.view = payload.type === "spelling-test" ? "game" : "worksheet";
     uiState.selectedWeekId = payload.selectedWeekId || uiState.selectedWeekId;
     saveActiveWorksheet(payload);
@@ -233,6 +236,65 @@ function getSelectedWeekId() {
     return selector?.value || uiState.selectedWeekId || getDefaultWeekId();
 }
 
+function findAnswerEntry(payload, answerId) {
+    for (const section of payload.sections) {
+        if (section.kind === "problems") {
+            const matchedProblem = section.problems.find((problem) => problem.id === answerId);
+            if (matchedProblem) {
+                return matchedProblem;
+            }
+        }
+
+        if (section.kind === "spelling") {
+            for (const row of section.practiceRows) {
+                const matchedEntry = row.entries.find((entry) => entry.id === answerId);
+                if (matchedEntry) {
+                    return matchedEntry;
+                }
+            }
+        }
+    }
+
+    return null;
+}
+
+function removeLiveAnswerFeedback(answerId) {
+    delete uiState.liveAnswerFeedback[answerId];
+}
+
+function syncSpellingRowLiveFeedback(row) {
+    if (!row) {
+        return;
+    }
+
+    const attempts = [...row.querySelectorAll(".spelling-attempt[data-answer-row]")];
+    const hasAttempts = attempts.length > 0;
+    const allChecked = hasAttempts && attempts.every((attempt) => attempt.classList.contains("spelling-attempt--checked"));
+    row.classList.toggle("spelling-row--checked", allChecked);
+}
+
+function applyLiveAnswerFeedback(answerId) {
+    const row = document.querySelector(`[data-answer-row="${answerId}"]`);
+    const input = document.querySelector(`[data-answer-id="${answerId}"]`);
+
+    if (!row || !input) {
+        return;
+    }
+
+    input.classList.add("answer-input--checked");
+
+    if (row.classList.contains("problem-row")) {
+        row.classList.add("problem-row--checked");
+        row.querySelector(".answer-wrap")?.classList.add("answer-wrap--checked");
+        return;
+    }
+
+    if (row.classList.contains("spelling-attempt")) {
+        row.classList.add("spelling-attempt--checked");
+        syncSpellingRowLiveFeedback(row.closest(".spelling-row"));
+    }
+}
+
 function clearFieldFeedback(target) {
     const answerId = target.dataset.answerId;
     const taskId = target.dataset.taskId;
@@ -241,9 +303,11 @@ function clearFieldFeedback(target) {
     if (answerId) {
         target.removeAttribute("aria-invalid");
         target.removeAttribute("aria-describedby");
+        target.classList.remove("answer-input--checked");
         const row = document.querySelector(`[data-answer-row="${answerId}"]`);
-        row?.classList.remove("problem-row--invalid", "problem-row--valid", "spelling-attempt--invalid", "spelling-attempt--valid");
-        row?.closest(".spelling-row")?.classList.remove("spelling-row--invalid", "spelling-row--valid");
+        row?.classList.remove("problem-row--invalid", "problem-row--valid", "problem-row--checked", "spelling-attempt--invalid", "spelling-attempt--valid", "spelling-attempt--checked");
+        row?.querySelector(".answer-wrap")?.classList.remove("answer-wrap--checked");
+        row?.closest(".spelling-row")?.classList.remove("spelling-row--invalid", "spelling-row--valid", "spelling-row--checked");
         row?.closest(".spelling-row")?.querySelector(".field-note")?.remove();
         document.getElementById(`${answerId}-note`)?.remove();
     }
@@ -260,6 +324,31 @@ function clearFieldFeedback(target) {
         row?.classList.remove("text-entry--invalid", "text-entry--valid");
         document.getElementById(`${textId}-note`)?.remove();
     }
+}
+
+function handleFocusOut(event) {
+    if (!uiState.activeWorksheet || isSpellingTest()) {
+        return;
+    }
+
+    const target = event.target;
+    const answerId = target.dataset.answerId;
+    if (!answerId) {
+        return;
+    }
+
+    const answerEntry = findAnswerEntry(uiState.activeWorksheet, answerId);
+    if (!answerEntry) {
+        return;
+    }
+
+    if (answerMatches(uiState.activeWorksheet.responses.answers[answerId], answerEntry.expectedAnswer)) {
+        uiState.liveAnswerFeedback[answerId] = true;
+        applyLiveAnswerFeedback(answerId);
+        return;
+    }
+
+    removeLiveAnswerFeedback(answerId);
 }
 
 function getActiveGameWord() {
@@ -290,7 +379,7 @@ function advanceGameRevealPhase() {
 
     if (game.phase === "preview-all") {
         game.phase = "preview-word";
-        updateGameFeedback("neutral", "Look closely at this word before it disappears.");
+        updateGameFeedback("neutral", "Look closely.");
         refreshActiveWorksheet();
         renderApp();
         return;
@@ -299,7 +388,7 @@ function advanceGameRevealPhase() {
     if (game.phase === "preview-word") {
         game.phase = "typing";
         game.currentInput = "";
-        updateGameFeedback("neutral", "Type the word you just saw. If it is wrong, it will come back again.");
+        updateGameFeedback("neutral", "Type it from memory.");
         refreshActiveWorksheet();
         uiState.pendingFocus = {
             type: "game-input",
@@ -338,7 +427,7 @@ function startSpellingTest() {
         word.solvedOnAttempt = null;
         word.guesses = [];
     });
-    updateGameFeedback("neutral", "These 10 words stay on screen for 3 seconds. Try to remember all of them.");
+    updateGameFeedback("neutral", "Look quickly. Then type.");
     refreshActiveWorksheet();
     renderApp();
 }
@@ -391,7 +480,7 @@ function submitSpellingGuess() {
 
     const guess = String(game.currentInput || "").trim();
     if (!guess) {
-        updateGameFeedback("error", "Type the word before you submit.");
+        updateGameFeedback("error", "Type the word first.");
         refreshActiveWorksheet();
         renderApp();
         return;
@@ -412,7 +501,7 @@ function submitSpellingGuess() {
         game.currentIndex += 1;
         game.currentInput = "";
         game.phase = "preview-word";
-        updateGameFeedback("success", "Correct. Here comes the next word.");
+        updateGameFeedback("success", "Correct. Next word.");
         refreshActiveWorksheet();
         renderApp();
         return;
@@ -420,7 +509,7 @@ function submitSpellingGuess() {
 
     game.currentInput = "";
     game.phase = "preview-word";
-    updateGameFeedback("error", "Not quite. Look at the same word again, then try once more.");
+    updateGameFeedback("error", "Try again. Same word.");
     refreshActiveWorksheet();
     renderApp();
 }
@@ -483,6 +572,7 @@ function handleAction(action) {
             clearActiveWorksheet();
             uiState.activeWorksheet = null;
             uiState.validation = null;
+            uiState.liveAnswerFeedback = {};
             uiState.view = "completion";
             renderApp();
             break;
@@ -548,6 +638,8 @@ function handleInput(event) {
 
     if (answerId) {
         setAnswerResponse(uiState.activeWorksheet, answerId, target.value);
+        uiState.validation = null;
+        removeLiveAnswerFeedback(answerId);
         clearFieldFeedback(target);
         refreshActiveWorksheet();
         return;
@@ -555,6 +647,7 @@ function handleInput(event) {
 
     if (textId) {
         setTextResponse(uiState.activeWorksheet, textId, target.value);
+        uiState.validation = null;
         clearFieldFeedback(target);
         refreshActiveWorksheet();
         return;
@@ -584,6 +677,7 @@ function handleChange(event) {
     }
 
     setTaskResponse(uiState.activeWorksheet, taskId, target.checked);
+    uiState.validation = null;
     clearFieldFeedback(target);
     refreshActiveWorksheet();
 }
@@ -610,6 +704,7 @@ function boot() {
     app.addEventListener("click", handleClick);
     app.addEventListener("mouseover", handleMouseOver);
     app.addEventListener("focusin", handleFocusIn);
+    app.addEventListener("focusout", handleFocusOut);
     app.addEventListener("input", handleInput);
     app.addEventListener("change", handleChange);
     app.addEventListener("submit", handleSubmit);

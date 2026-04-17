@@ -17,9 +17,30 @@ test("index.html uses GitHub Pages-safe relative asset paths", async () => {
     assert(!html.includes('src="/js/app.js"'));
 });
 
+test("index.html includes share-preview metadata and icon assets", async () => {
+    const html = await fs.readFile(path.join(projectRoot, "index.html"), "utf8");
+
+    assert(html.includes('rel="icon" type="image/svg+xml" href="./assets/favicon.svg"'));
+    assert(html.includes('rel="icon" type="image/png" sizes="256x256" href="./assets/favicon.png"'));
+    assert(html.includes('rel="apple-touch-icon" href="./assets/favicon.png"'));
+    assert(html.includes('property="og:image" content="https://prostranstvo.github.io/math_gen/assets/share-preview.png"'));
+    assert(html.includes('name="twitter:card" content="summary_large_image"'));
+    assert(html.includes('property="og:title" content="Math Gen | Pick today\'s sheet"'));
+});
+
 test(".nojekyll is present at the project root", async () => {
     const stats = await fs.stat(path.join(projectRoot, ".nojekyll"));
     assert.equal(stats.isFile(), true);
+});
+
+test("share-preview asset files are present", async () => {
+    const faviconStats = await fs.stat(path.join(projectRoot, "assets", "favicon.svg"));
+    const faviconPngStats = await fs.stat(path.join(projectRoot, "assets", "favicon.png"));
+    const sharePreviewStats = await fs.stat(path.join(projectRoot, "assets", "share-preview.png"));
+
+    assert.equal(faviconStats.isFile(), true);
+    assert.equal(faviconPngStats.isFile(), true);
+    assert.equal(sharePreviewStats.isFile(), true);
 });
 
 test("styles.css keeps compatibility fallbacks for older mobile browsers", async () => {

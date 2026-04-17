@@ -333,6 +333,10 @@ a:focus-visible {
 .product-kicker {
     display: inline-flex;
     width: fit-content;
+    min-width: 9.75rem;
+    min-height: 2.35rem;
+    align-items: center;
+    justify-content: center;
     padding: 0.32rem 0.7rem;
     border-radius: 999px;
     background: color-mix(in srgb, var(--surface-band) 80%, white);
@@ -426,12 +430,18 @@ a:focus-visible {
 
 .product-panel {
     display: grid;
+    grid-template-rows: auto auto auto 1fr auto;
+    align-content: start;
     gap: var(--space-4);
     min-height: 20rem;
     padding: clamp(var(--space-5), 3vw, var(--space-6));
     border-radius: calc(var(--radius-xl) + 0.25rem);
     background: var(--surface);
     border: 1px solid color-mix(in srgb, var(--line-strong) 65%, white);
+}
+
+.product-panel h3 {
+    align-self: start;
 }
 
 .product-panel--primary {

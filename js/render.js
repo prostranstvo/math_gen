@@ -476,7 +476,7 @@ export function renderGameView({ payload }) {
     const game = payload.game || { words: [], currentIndex: 0, phase: "ready", currentInput: "", feedback: null };
     const helperNote = payload.helperNote || {
         title: "Look, remember, then type.",
-        copy: "You will see all 10 words for 3 seconds, then one word at a time.",
+        copy: "You will see 20 words for 3 seconds, then one word at a time.",
         actionLabel: "Start Test"
     };
     const completedWords = game.words.filter((word) => word.status === "correct").length;
@@ -555,7 +555,7 @@ export function renderGameView({ payload }) {
                         <div class="game-card game-card--intro">
                             <h2 class="section-title">Spelling memory round.</h2>
                             <div class="game-rule-chips">
-                                <span class="game-rule-chip">10 words</span>
+                                <span class="game-rule-chip">20 words</span>
                                 <span class="game-rule-chip">3 seconds to look</span>
                                 <span class="game-rule-chip">Type from memory</span>
                                 <span class="game-rule-chip">Perfect round = +1 trophy</span>
@@ -570,7 +570,7 @@ export function renderGameView({ payload }) {
                     ${isShowingAll ? `
                         <div class="game-card">
                             <p class="eyebrow">Look quickly</p>
-                            <h2 class="section-title">These are your 10 words.</h2>
+                            <h2 class="section-title">These are your 20 words.</h2>
                             <div class="game-word-grid">
                                 ${game.words.map((word) => `
                                     <button
@@ -734,7 +734,7 @@ export function renderCompletionView({ completionData, progress }) {
         ? [
             {
                 label: "First-try score",
-                value: `${details?.score || 0} / ${details?.totalWords || 10}`
+                value: `${details?.score || 0} / ${details?.totalWords || 20}`
             },
             {
                 label: "Total tries",

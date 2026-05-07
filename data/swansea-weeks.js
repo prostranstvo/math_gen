@@ -254,7 +254,18 @@ export const swanseaWeeks = Object.freeze({
         mathTopic: "Financial Literacy",
         scienceTopic: "Conservation of Energy and Resources",
         reviewPrompt: "List 3 facts about energy sources, energy forms, or ways to conserve resources."
+    },
+    "24": {
+        weekId: "24",
+        date: "May 1, 2026",
+        spelling: ["fountain", "friendship", "journey", "medicine", "handle", "knee", "knight", "knowledge", "known", "kneel", "gnarl", "gnaw", "assign", "align", "campaign"],
+        grammar: "Consonant /n/ spelled n, kn, and gn.",
+        writingTopic: "Biographies",
+        writingPrompt: "Choose a person for a biography and begin the research process by collecting important facts about their life.",
+        mathTopic: "Financial Literacy",
+        scienceTopic: "Science Fair",
+        reviewPrompt: "List 3 ideas for a science fair project or 3 facts about your project topic."
     }
 });
 
-export const weekOrder = Object.freeze(["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]);
+export const weekOrder = Object.freeze(["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]);

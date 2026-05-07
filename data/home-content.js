@@ -34,7 +34,7 @@ export const homeContent = Object.freeze({
         test: Object.freeze({
             kicker: "Test yourself",
             title: "Test Yourself",
-            copy: "Ten words from memory.",
+            copy: "Twenty words from memory.",
             preview: "Look. Remember. Type.",
             ctaLabel: "Start Spelling Test"
         })

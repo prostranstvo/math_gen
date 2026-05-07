@@ -35,7 +35,7 @@ test("generateMathWorksheet builds four problem sections with tracked responses"
     });
 });
 
-test("generateSpellingTestGame builds a 10-word spelling round from across the Swansea pool", () => {
+test("generateSpellingTestGame builds a 20-word spelling round from across the Swansea pool", () => {
     const payload = generateSpellingTestGame();
     const selectedWords = payload.game.words.map((word) => word.word.toLowerCase());
 
@@ -45,8 +45,8 @@ test("generateSpellingTestGame builds a 10-word spelling round from across the S
     assert.equal(payload.helperNote.actionLabel, "Start Test");
     assert.equal(payload.sections.length, 0);
     assert.equal(payload.game.phase, "ready");
-    assert.equal(payload.game.words.length, 10);
-    assert.equal(new Set(selectedWords).size, 10);
+    assert.equal(payload.game.words.length, 20);
+    assert.equal(new Set(selectedWords).size, 20);
     assert.equal(Object.keys(payload.responses.answers).length, 0);
     assert.equal(Object.keys(payload.responses.tasks).length, 0);
     assert.equal(Object.keys(payload.responses.text).length, 0);

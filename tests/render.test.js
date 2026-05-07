@@ -139,6 +139,7 @@ test("game view renders the timed spelling test layout", () => {
     assert(html.includes("Start Test"));
     assert.equal((html.match(/Start Test/g) || []).length, 2);
     assert(html.includes('data-game-form') === false);
+    assert(html.includes("20 words"));
     assert(html.includes("Perfect round = +1 trophy"));
     assert(html.includes('class="game-card-actions no-print"'));
     assert(html.includes('class="game-rule-chip"'));
@@ -146,6 +147,7 @@ test("game view renders the timed spelling test layout", () => {
 
     payload.game.phase = "preview-all";
     const previewHtml = renderGameView({ payload });
+    assert(previewHtml.includes("These are your 20 words."));
     assert(previewHtml.includes('class="game-word-chip"'));
     assert(previewHtml.includes('data-speak-text='));
 

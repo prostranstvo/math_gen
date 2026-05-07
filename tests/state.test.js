@@ -157,9 +157,9 @@ test("recordCompletion uses trophyPoints for perfect spelling rounds", () => {
     payload.completionLabel = "Spelling Test - Perfect Round";
     payload.trophyPoints = 2;
     payload.completionDetails = {
-        score: 10,
-        totalWords: 10,
-        totalAttempts: 10,
+        score: 20,
+        totalWords: 20,
+        totalAttempts: 20,
         bonusAwarded: true
     };
 

@@ -55,6 +55,8 @@ import { swanseaWeeks, weekOrder } from "../data/swansea-weeks.js";
  * @property {Object} [completionDetails]
  */
 
+const SPELLING_TEST_WORD_COUNT = 20;
+
 export function getDefaultWeekId() {
     return weekOrder[weekOrder.length - 1];
 }
@@ -756,18 +758,18 @@ export function generateSpellingTestGame() {
         navLabel: "Test",
         displayLabel: "Test Yourself",
         title: "Test Yourself",
-        subtitle: "10 spelling words. Look, remember, type.",
+        subtitle: `${SPELLING_TEST_WORD_COUNT} spelling words. Look, remember, type.`,
         accent: "game",
         completionLabel: "Spelling Test",
         helperNote: {
             title: "Look. Remember. Type.",
-            copy: "10 words. 3 seconds to look. Then type.",
+            copy: `${SPELLING_TEST_WORD_COUNT} words. 3 seconds to look. Then type.`,
             actionLabel: "Start Test"
         },
         selectedWeekId: null
     });
 
-    const words = shuffle(buildSpellingWordPool()).slice(0, 10);
+    const words = shuffle(buildSpellingWordPool()).slice(0, SPELLING_TEST_WORD_COUNT);
     payload.game = {
         phase: "ready",
         revealDurationMs: 3000,
@@ -775,7 +777,7 @@ export function generateSpellingTestGame() {
         currentInput: "",
         feedback: {
             tone: "neutral",
-            message: "10 words. Then type from memory."
+            message: `${SPELLING_TEST_WORD_COUNT} words. Then type from memory.`
         },
         words: words.map((word, index) => ({
             id: `${payload.id}-word-${index + 1}`,

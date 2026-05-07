@@ -554,10 +554,41 @@ a:focus-visible {
 }
 
 .history-item {
-    padding: var(--space-4);
+    padding: 0;
     border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--surface-soft) 94%, white);
     border: 1px solid var(--line);
+    overflow: hidden;
+}
+
+.history-item > strong,
+.history-item > span {
+    padding-inline: var(--space-4);
+}
+
+.history-item > strong:first-child {
+    padding-top: var(--space-4);
+}
+
+.history-item > span:last-child {
+    padding-bottom: var(--space-4);
+}
+
+.history-button {
+    display: block;
+    width: 100%;
+    min-height: 100%;
+    padding: var(--space-4);
+    color: inherit;
+    text-align: left;
+    border-radius: inherit;
+    transition: background var(--transition), transform var(--transition);
+}
+
+.history-button:hover,
+.history-button:focus-visible {
+    background: color-mix(in srgb, var(--accent-soft) 55%, white);
+    transform: translateY(-1px);
 }
 
 .history-item strong {
@@ -569,6 +600,11 @@ a:focus-visible {
     margin-top: var(--space-2);
     color: var(--text-soft);
     font-size: 0.92rem;
+}
+
+.history-action {
+    color: var(--accent) !important;
+    font-weight: 700;
 }
 
 .summary-strip--proud {
@@ -1134,6 +1170,91 @@ a:focus-visible {
     font-size: clamp(1.25rem, 2vw, 1.65rem);
 }
 
+.answer-record-shell {
+    gap: var(--space-6);
+}
+
+.answer-record-hero .completion-title {
+    max-width: 8ch;
+}
+
+.answer-record-sections {
+    display: grid;
+    gap: var(--space-5);
+}
+
+.answer-record-section {
+    gap: var(--space-4);
+}
+
+.answer-record-list {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.answer-record-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.9fr);
+    gap: var(--space-4);
+    align-items: start;
+    padding: var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--surface) 96%, white);
+}
+
+.answer-record-label,
+.answer-record-meta,
+.answer-record-values span {
+    display: block;
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.answer-record-question strong {
+    display: block;
+    margin-top: var(--space-2);
+    line-height: 1.35;
+}
+
+.answer-record-meta {
+    margin-top: var(--space-3);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.answer-record-values {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.answer-record-values p {
+    margin: var(--space-1) 0 0;
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+.answer-record-status {
+    width: fit-content;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.answer-record-status--checked {
+    color: color-mix(in srgb, var(--success) 80%, black);
+    background: var(--success-soft);
+}
+
+.answer-record-status--review {
+    color: color-mix(in srgb, var(--danger) 80%, black);
+    background: var(--danger-soft);
+}
+
 .game-lines {
     min-width: 10.5rem;
 }
@@ -1646,7 +1767,8 @@ a:focus-visible {
 
     .spelling-attempts,
     .history-list--saved,
-    .history-list--proud {
+    .history-list--proud,
+    .answer-record-item {
         grid-template-columns: 1fr;
     }
 }
@@ -1690,7 +1812,8 @@ a:focus-visible {
     .section-sheet,
     .completion-hero,
     .validation-summary,
-    .completion-saved {
+    .completion-saved,
+    .answer-record-item {
         background: white !important;
         border: 0 !important;
         box-shadow: none !important;

@@ -133,6 +133,23 @@ test("recordCompletion increments the shelf and caps history", () => {
     assert.equal(shelf.stats.completedTests, 0);
 });
 
+test("recordCompletion saves answer review for completed homework", () => {
+    const storage = createMemoryStorage();
+    const payload = fillAllCorrectAnswers(generateFullHomework("23"));
+    const result = recordCompletion(payload, storage);
+    const review = result.entry.answerReview;
+    const mathSection = review.sections.find((section) => section.title.includes("Weekly Math"));
+    const spellingSection = review.sections.find((section) => section.kind === "spelling");
+
+    assert.equal(review.weekId, "23");
+    assert.equal(mathSection.items.every((item) => item.correct), true);
+    assert.equal(spellingSection.items.length, 15);
+    assert.equal(spellingSection.items[0].answer, "affection, affection, affection");
+
+    const shelf = getProgressShelf(storage);
+    assert.equal(shelf.history[0].answerReview.sections.length > 0, true);
+});
+
 test("recordCompletion uses trophyPoints for perfect spelling rounds", () => {
     const storage = createMemoryStorage();
     const payload = generateSpellingTestGame();

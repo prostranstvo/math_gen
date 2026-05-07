@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { homeContent } from "../data/home-content.js";
 import { swanseaWeeks } from "../data/swansea-weeks.js";
 import { generateFullHomework, generateSpellingTestGame } from "../js/generator.js";
-import { renderGameView, renderHomeView, renderWorksheetView } from "../js/render.js";
+import { renderCompletionRecordView, renderGameView, renderHomeView, renderWorksheetView } from "../js/render.js";
 
 test("home view renders the local nav, choose section, smart thinking, and proud board", () => {
     const html = renderHomeView({
@@ -13,7 +13,32 @@ test("home view renders the local nav, choose section, smart thinking, and proud
         selectedWeekId: "10",
         progress: {
             trophies: 2,
-            history: [],
+            history: [
+                {
+                    id: "saved-week-23",
+                    type: "full-homework",
+                    weekId: "23",
+                    label: "Full Homework - Week 23",
+                    completedAt: "2026-04-24T20:00:00.000Z",
+                    answerReview: {
+                        sections: [
+                            {
+                                title: "Part 2: Weekly Math - Financial Literacy",
+                                kind: "problems",
+                                items: [
+                                    {
+                                        label: "Question 1",
+                                        prompt: "10 + 5",
+                                        answer: "15",
+                                        expectedAnswer: "15",
+                                        correct: true
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
             stats: {
                 completedPages: 4,
                 perfectSpellingRounds: 1
@@ -40,7 +65,45 @@ test("home view renders the local nav, choose section, smart thinking, and proud
     assert(html.includes(homeContent.proudBoard.title));
     assert(html.includes("Pages Finished"));
     assert(html.includes("Perfect Tests"));
+    assert(html.includes('data-action="view-completion-record"'));
+    assert(html.includes('data-record-id="saved-week-23"'));
+    assert(html.includes("View answers"));
     assert(html.includes('id="why"') === false);
+});
+
+test("completion record view renders saved answers", () => {
+    const html = renderCompletionRecordView({
+        entry: {
+            id: "saved-week-23",
+            type: "full-homework",
+            weekId: "23",
+            label: "Full Homework - Week 23",
+            completedAt: "2026-04-24T20:00:00.000Z",
+            answerReview: {
+                sections: [
+                    {
+                        title: "Part 2: Weekly Math - Financial Literacy",
+                        kind: "problems",
+                        items: [
+                            {
+                                label: "Question 1",
+                                prompt: "10 + 5",
+                                answer: "15",
+                                expectedAnswer: "15",
+                                correct: true
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    });
+
+    assert(html.includes("Answers saved."));
+    assert(html.includes("Typed answer"));
+    assert(html.includes("Expected"));
+    assert(html.includes("15"));
+    assert(html.includes("Checked"));
 });
 
 test("worksheet view renders helper notes and section presentation metadata", () => {

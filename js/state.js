@@ -57,6 +57,7 @@ function normalizeProgressStats(stats, history = []) {
  * @property {string|null} weekId
  * @property {string} label
  * @property {string} completedAt
+ * @property {Object|null} answerReview
  */
 
 /**
@@ -452,13 +453,127 @@ export function clearActiveWorksheet(storage = getSessionStorage()) {
     removeValue(storage, STORAGE_KEYS.activeWorksheet);
 }
 
+function getResponseValue(map, id) {
+    return String(map?.[id] || "").trim();
+}
+
+function buildCompletionAnswerReview(payload) {
+    normalizeWorksheetPayload(payload);
+
+    if (payload.type === "spelling-test" && payload.game?.words) {
+        return {
+            type: payload.type,
+            title: payload.title,
+            subtitle: payload.subtitle,
+            weekId: payload.selectedWeekId || null,
+            sections: [
+                {
+                    title: "Spelling test words",
+                    kind: "spelling-test",
+                    items: payload.game.words.map((word, index) => ({
+                        kind: "spelling-test",
+                        label: `Word ${index + 1}`,
+                        prompt: word.word,
+                        answer: word.guesses?.length ? word.guesses.join(", ") : "",
+                        expectedAnswer: word.word,
+                        correct: word.status === "correct",
+                        attempts: Number(word.attempts) || 0
+                    }))
+                }
+            ]
+        };
+    }
+
+    const sections = payload.sections.map((section) => {
+        if (section.kind === "problems") {
+            return {
+                title: section.title,
+                kind: section.kind,
+                items: section.problems.map((problem, index) => {
+                    const answer = getResponseValue(payload.responses.answers, problem.id);
+                    return {
+                        kind: "answer",
+                        label: `Question ${index + 1}`,
+                        prompt: problem.prompt,
+                        answer,
+                        expectedAnswer: problem.expectedAnswer,
+                        correct: answerMatches(answer, problem.expectedAnswer)
+                    };
+                })
+            };
+        }
+
+        if (section.kind === "spelling") {
+            return {
+                title: section.title,
+                kind: section.kind,
+                items: section.practiceRows.map((row, index) => ({
+                    kind: "spelling",
+                    label: `Word ${index + 1}`,
+                    prompt: row.word,
+                    answer: row.entries.map((entry) => getResponseValue(payload.responses.answers, entry.id)).filter(Boolean).join(", "),
+                    expectedAnswer: row.word,
+                    correct: row.entries.every((entry) => answerMatches(payload.responses.answers[entry.id], entry.expectedAnswer))
+                }))
+            };
+        }
+
+        if (section.responseField) {
+            const answer = getResponseValue(payload.responses.text, section.responseField.id);
+            return {
+                title: section.title,
+                kind: section.kind,
+                items: [
+                    {
+                        kind: "text",
+                        label: section.responseField.label || section.title,
+                        prompt: section.hint || section.title,
+                        answer,
+                        expectedAnswer: null,
+                        correct: hasEnoughText(answer, section.responseField.minWords)
+                    }
+                ]
+            };
+        }
+
+        if (section.manualTask) {
+            const completed = Boolean(payload.responses.tasks[section.manualTask.id]);
+            return {
+                title: section.title,
+                kind: section.kind,
+                items: [
+                    {
+                        kind: "task",
+                        label: section.manualTask.label,
+                        prompt: section.title,
+                        answer: completed ? "Done" : "Not done",
+                        expectedAnswer: "Done",
+                        correct: completed
+                    }
+                ]
+            };
+        }
+
+        return null;
+    }).filter((section) => section && section.items.length > 0);
+
+    return {
+        type: payload.type,
+        title: payload.title,
+        subtitle: payload.subtitle,
+        weekId: payload.selectedWeekId || null,
+        sections
+    };
+}
+
 export function buildCompletionEntry(payload) {
     return {
         id: payload.id,
         type: payload.type,
         weekId: payload.selectedWeekId || null,
         label: payload.completionLabel,
-        completedAt: new Date().toISOString()
+        completedAt: new Date().toISOString(),
+        answerReview: buildCompletionAnswerReview(payload)
     };
 }
 

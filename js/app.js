@@ -1,7 +1,7 @@
 import { homeContent } from "../data/home-content.js";
 import { swanseaWeeks, weekOrder } from "../data/swansea-weeks.js";
 import { generateFullHomework, generateMathWorksheet, generateSpellingTestGame, getDefaultWeekId } from "./generator.js";
-import { renderCompletionView, renderGameView, renderHomeView, renderWorksheetView } from "./render.js";
+import { renderCompletionRecordView, renderCompletionView, renderGameView, renderHomeView, renderWorksheetView } from "./render.js";
 import {
     answerMatches,
     clearActiveWorksheet,
@@ -23,6 +23,7 @@ const uiState = {
     activeWorksheet: null,
     validation: null,
     completionData: null,
+    completionRecord: null,
     pendingFocus: null,
     liveAnswerFeedback: {}
 };
@@ -166,6 +167,10 @@ function renderApp() {
             completionData: uiState.completionData,
             progress
         });
+    } else if (uiState.view === "record" && uiState.completionRecord) {
+        markup = renderCompletionRecordView({
+            entry: uiState.completionRecord
+        });
     } else {
         markup = renderHomeView({
             content: homeContent,
@@ -216,6 +221,7 @@ function openWorksheet(payload) {
     uiState.activeWorksheet = payload;
     uiState.validation = null;
     uiState.completionData = null;
+    uiState.completionRecord = null;
     uiState.liveAnswerFeedback = {};
     uiState.view = payload.type === "spelling-test" ? "game" : "worksheet";
     uiState.selectedWeekId = payload.selectedWeekId || uiState.selectedWeekId;
@@ -514,7 +520,12 @@ function submitSpellingGuess() {
     renderApp();
 }
 
-function handleAction(action) {
+function findCompletionRecord(recordId) {
+    const progress = getProgressShelf();
+    return progress.history.find((entry) => entry.id === recordId) || null;
+}
+
+function handleAction(action, target = null) {
     switch (action) {
         case "generate-math":
             openWorksheet(generateMathWorksheet());
@@ -538,10 +549,24 @@ function handleAction(action) {
                 renderApp();
             }
             break;
+        case "view-completion-record": {
+            const record = findCompletionRecord(target?.dataset.recordId || "");
+            if (!record) {
+                return;
+            }
+
+            uiState.completionRecord = record;
+            uiState.completionData = null;
+            uiState.validation = null;
+            uiState.view = "record";
+            renderApp();
+            break;
+        }
         case "go-home":
             uiState.view = "home";
             uiState.validation = null;
             uiState.completionData = null;
+            uiState.completionRecord = null;
             renderApp();
             break;
         case "print-sheet":
@@ -605,7 +630,7 @@ function handleClick(event) {
         return;
     }
 
-    handleAction(actionTarget.dataset.action);
+    handleAction(actionTarget.dataset.action, actionTarget);
 }
 
 function handleMouseOver(event) {

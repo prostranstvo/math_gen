@@ -21,12 +21,24 @@ function renderHistoryList(history, emptyMessage, variantClass = "") {
 
     return `
         <ol class="history-list ${variantClass}">
-            ${history.map((entry) => `
-                <li class="history-item">
+            ${history.map((entry) => {
+                const hasReview = Boolean(entry.answerReview?.sections?.length);
+                const content = `
                     <strong>${escapeHtml(entry.label)}</strong>
                     <span>${escapeHtml(formatCompletionDate(entry.completedAt))}</span>
-                </li>
-            `).join("")}
+                    ${hasReview ? `<span class="history-action">View answers</span>` : ""}
+                `;
+
+                return `
+                    <li class="history-item ${hasReview ? "history-item--actionable" : ""}">
+                        ${hasReview ? `
+                            <button class="history-button" type="button" data-action="view-completion-record" data-record-id="${escapeHtml(entry.id)}">
+                                ${content}
+                            </button>
+                        ` : content}
+                    </li>
+                `;
+            }).join("")}
         </ol>
     `;
 }
@@ -614,6 +626,91 @@ export function renderGameView({ payload }) {
                         </form>
                     ` : ""}
                 </section>
+            </main>
+        </div>
+    `;
+}
+
+function formatReviewAnswer(value) {
+    const text = String(value || "").trim();
+    return text || "Blank";
+}
+
+function renderAnswerReviewItem(item) {
+    const statusLabel = item.correct ? "Checked" : "Needs review";
+    const statusClass = item.correct ? "answer-record-status--checked" : "answer-record-status--review";
+
+    return `
+        <article class="answer-record-item">
+            <div class="answer-record-question">
+                <span class="answer-record-label">${escapeHtml(item.label || "Answer")}</span>
+                <strong>${escapeHtml(item.prompt || "Response")}</strong>
+                ${item.attempts ? `<span class="answer-record-meta">${escapeHtml(String(item.attempts))} ${item.attempts === 1 ? "try" : "tries"}</span>` : ""}
+            </div>
+            <div class="answer-record-values">
+                <div>
+                    <span>Typed answer</span>
+                    <p>${escapeHtml(formatReviewAnswer(item.answer))}</p>
+                </div>
+                ${item.expectedAnswer ? `
+                    <div>
+                        <span>Expected</span>
+                        <p>${escapeHtml(formatReviewAnswer(item.expectedAnswer))}</p>
+                    </div>
+                ` : ""}
+                <span class="answer-record-status ${statusClass}">${escapeHtml(statusLabel)}</span>
+            </div>
+        </article>
+    `;
+}
+
+function renderAnswerReviewSection(section) {
+    return `
+        <section class="section-sheet answer-record-section">
+            <div class="section-header">
+                <p class="section-step">${escapeHtml(section.kind || "Saved")}</p>
+                <h2 class="section-title">${escapeHtml(section.title)}</h2>
+            </div>
+            <div class="answer-record-list">
+                ${section.items.map((item) => renderAnswerReviewItem(item)).join("")}
+            </div>
+        </section>
+    `;
+}
+
+export function renderCompletionRecordView({ entry }) {
+    const review = entry.answerReview || null;
+    const sections = review?.sections || [];
+
+    return `
+        <div class="page-shell completion-shell answer-record-shell">
+            <section class="completion-hero answer-record-hero">
+                <p class="eyebrow">Saved record</p>
+                <h1 class="completion-title">Answers saved.</h1>
+                <p class="panel-copy">${escapeHtml(entry.label)} was completed on ${escapeHtml(formatCompletionDate(entry.completedAt))}.</p>
+                <div class="summary-strip">
+                    <div class="summary-item">
+                        <span>Page</span>
+                        <strong>${escapeHtml(entry.label)}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Week</span>
+                        <strong>${escapeHtml(entry.weekId ? `Week ${entry.weekId}` : "Practice")}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Saved at</span>
+                        <strong>${escapeHtml(formatCompletionDate(entry.completedAt))}</strong>
+                    </div>
+                </div>
+                <div class="toolbar no-print">
+                    <button class="button button--ghost" type="button" data-action="go-home">Back to Sheets</button>
+                </div>
+            </section>
+
+            <main class="worksheet-sections answer-record-sections">
+                ${sections.length
+                    ? sections.map((section) => renderAnswerReviewSection(section)).join("")
+                    : `<section class="section-sheet"><p class="panel-copy">This older record does not include saved answers.</p></section>`}
             </main>
         </div>
     `;

@@ -440,6 +440,17 @@ function buildFinancialLiteracyProblems(builder) {
     ]);
 }
 
+function buildProbabilityProblems(builder) {
+    return shuffle([
+        builder.problem("A bag has 3 red marbles and 7 blue marbles. What fraction of the marbles are red?", "3/10", { inputMode: "text" }),
+        builder.problem("A spinner has 4 equal sections and 1 section is green. What is the probability of landing on green?", "1/4", { inputMode: "text" }),
+        builder.problem("Write certain, likely, unlikely, or impossible: rolling a 7 on a regular six-sided die.", "impossible", { inputMode: "text" }),
+        builder.problem("If 6 out of 10 coin flips landed heads, how many landed tails?", 4),
+        builder.problem("On a probability line from 0 to 1, which is greater: 1/2 or 1/4? Write the greater fraction.", "1/2", { inputMode: "text" }),
+        builder.problem("A forecast says there is an 8 out of 10 chance of rain. Is rain likely or unlikely?", "likely", { inputMode: "text" })
+    ]);
+}
+
 function buildAngleProblems(builder) {
     return shuffle([
         builder.problem("A right angle measures ___ degrees.", 90),
@@ -582,6 +593,15 @@ function buildWeeklyMathSectionByTopic(week, builder) {
             hint: "Track each move one step at a time and match the math word to the motion.",
             layout: "list",
             problems: buildGridTransformationProblems(builder)
+        };
+    }
+
+    if (topic.includes("probability")) {
+        return {
+            title: sharedTitle,
+            hint: "Use fractions and probability words to describe how likely each event is.",
+            layout: "list",
+            problems: buildProbabilityProblems(builder)
         };
     }
 

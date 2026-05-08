@@ -265,7 +265,18 @@ export const swanseaWeeks = Object.freeze({
         mathTopic: "Financial Literacy",
         scienceTopic: "Science Fair",
         reviewPrompt: "List 3 ideas for a science fair project or 3 facts about your project topic."
+    },
+    "25": {
+        weekId: "25",
+        date: "May 8, 2026",
+        spelling: ["accomplish", "finished", "shield", "shorten", "shoulder", "sluggish", "shuffle", "furnish", "leash", "shattered", "caution", "creation", "definition", "imitation", "separation"],
+        grammar: "Digraph /sh/ spelled sh and ti.",
+        writingTopic: "Biographies",
+        writingPrompt: "Write the first draft of your biography using your graphic organizer and research notes.",
+        mathTopic: "Probability",
+        scienceTopic: "Science Fair",
+        reviewPrompt: "List 3 steps from your science fair investigation or 3 findings you have recorded so far."
     }
 });
 
-export const weekOrder = Object.freeze(["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]);
+export const weekOrder = Object.freeze(["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"]);

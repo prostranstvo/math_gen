@@ -109,16 +109,19 @@ test("new 2026 week topics generate matching weekly math practice", () => {
     const triangleWeek = generateFullHomework("19");
     const gridWeek = generateFullHomework("20");
     const moneyWeek = generateFullHomework("21");
+    const probabilityWeek = generateFullHomework("25");
 
     const dataPrompts = dataWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const anglePrompts = angleWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const trianglePrompts = triangleWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const gridPrompts = gridWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const moneyPrompts = moneyWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
+    const probabilityPrompts = probabilityWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
 
     assert(dataPrompts.some((prompt) => prompt.includes("mode") || prompt.includes("median")));
     assert(anglePrompts.some((prompt) => prompt.includes("acute") || prompt.includes("obtuse") || prompt.includes("right angle")));
     assert(trianglePrompts.some((prompt) => prompt.includes("triangle")));
     assert(gridPrompts.some((prompt) => prompt.includes("slide") || prompt.includes("turn") || prompt.includes("flip")));
     assert(moneyPrompts.some((prompt) => prompt.includes("$")));
+    assert(probabilityPrompts.some((prompt) => prompt.includes("probability") || prompt.includes("likely") || prompt.includes("chance")));
 });

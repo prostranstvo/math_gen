@@ -484,6 +484,55 @@ function buildGridTransformationProblems(builder) {
     ]);
 }
 
+function takeProblems(problems, count) {
+    return problems.slice(0, count);
+}
+
+function buildMeasurementConversionReviewProblems(builder) {
+    return shuffle([
+        ...takeProblems(buildMeasurementProblems(builder), 3),
+        ...takeProblems(buildMetricConversionProblems(builder), 3)
+    ]);
+}
+
+function buildDataReviewProblems(builder) {
+    return shuffle([
+        ...takeProblems(buildDataManagementProblems(builder), 4),
+        builder.problem("A table shows 4 students chose apples, 7 chose bananas, and 5 chose oranges. How many students answered the survey?", 16),
+        builder.problem("Find the range: 9, 12, 15, 18, 20", 11)
+    ]);
+}
+
+function buildGeometryReviewProblems(builder) {
+    return shuffle([
+        ...takeProblems(buildPerimeterAreaProblems(builder), 2),
+        ...takeProblems(buildAngleProblems(builder), 2),
+        ...takeProblems(buildTriangleProblems(builder), 1),
+        ...takeProblems(buildGridTransformationProblems(builder), 1)
+    ]);
+}
+
+function buildFinancialProbabilityReviewProblems(builder) {
+    return shuffle([
+        ...takeProblems(buildFinancialLiteracyProblems(builder), 3),
+        ...takeProblems(buildProbabilityProblems(builder), 3)
+    ]);
+}
+
+function buildPatternTableProblems(builder) {
+    const start = getRandomInt(2, 8);
+    const step = getRandomInt(3, 9);
+    const fifthTerm = start + (step * 4);
+    const shrinkStart = getRandomInt(70, 95);
+    const shrinkStep = getRandomInt(4, 8);
+    const fourthTerm = shrinkStart - (shrinkStep * 3);
+
+    return [
+        builder.problem(`A growing pattern starts at ${start} and adds ${step} each time. What is term 5?`, fifthTerm),
+        builder.problem(`A shrinking pattern starts at ${shrinkStart} and subtracts ${shrinkStep} each time. What is term 4?`, fourthTerm)
+    ];
+}
+
 function buildWeeklyMathSectionByTopic(week, builder) {
     const topic = String(week.mathTopic || "").toLowerCase();
     const sharedTitle = `Part 2: Weekly Math - ${week.mathTopic}`;
@@ -715,7 +764,7 @@ export function generateMathWorksheet() {
         navLabel: "Practice",
         displayLabel: "Math Practice",
         title: "Math Practice",
-        subtitle: "A focused extra page for multiplication, division, algebra balance, and story problems.",
+        subtitle: "A focused extra page that spirals through the Swansea math strands.",
         accent: "math",
         completionLabel: "Math Practice",
         helperNote: {
@@ -729,44 +778,71 @@ export function generateMathWorksheet() {
     const builder = createBuilder(payload.id);
     payload.sections = [
         {
-            id: "practice-multiplication",
+            id: "practice-number-fluency",
             kind: "problems",
             stepLabel: "Step 1",
             surfaceVariant: "plain",
-            title: "Multiplication Practice",
-            hint: "Work carefully and check your basic facts before you finish.",
+            title: "Number Fluency",
+            hint: "Warm up with multiplication, division, and pattern thinking.",
             layout: "list",
-            problems: buildMultiplicationProblems(builder, 5)
+            problems: shuffle([
+                ...buildMultiplicationProblems(builder, 2),
+                ...buildDivisionProblems(builder, 2),
+                ...buildPatternTableProblems(builder)
+            ])
         },
         {
-            id: "practice-division",
+            id: "practice-measurement",
             kind: "problems",
             stepLabel: "Step 2",
             surfaceVariant: "soft",
-            title: "Division Practice",
-            hint: "These problems divide evenly so you can focus on the steps.",
+            title: "Measurement and Conversions",
+            hint: "Read the units carefully before you calculate or convert.",
             layout: "list",
-            problems: buildDivisionProblems(builder, 5)
+            problems: buildMeasurementConversionReviewProblems(builder)
         },
         {
-            id: "practice-balance",
+            id: "practice-data",
             kind: "problems",
             stepLabel: "Step 3",
             surfaceVariant: "mist",
-            title: "Algebra Balance and Logic",
-            hint: "Solve for x and show your steps on paper if you want extra practice.",
+            title: "Data Management",
+            hint: "Sort the values, compare the categories, and check what the question is asking.",
             layout: "list",
-            problems: buildAlgebraBalanceProblems(builder, 5)
+            problems: buildDataReviewProblems(builder)
         },
         {
-            id: "practice-word",
+            id: "practice-geometry",
             kind: "problems",
             stepLabel: "Step 4",
             surfaceVariant: "warm",
-            title: "Algebra Word Problems",
-            hint: "Read the story, decide on the missing value, then solve.",
+            title: "Geometry Review",
+            hint: "Keep area, perimeter, angles, triangles, and transformations in their own boxes.",
             layout: "list",
-            problems: buildAlgebraWordProblems(builder)
+            problems: buildGeometryReviewProblems(builder)
+        },
+        {
+            id: "practice-money-probability",
+            kind: "problems",
+            stepLabel: "Step 5",
+            surfaceVariant: "soft",
+            title: "Money and Probability",
+            hint: "Line up money decimals and use fractions or chance words for probability.",
+            layout: "list",
+            problems: buildFinancialProbabilityReviewProblems(builder)
+        },
+        {
+            id: "practice-algebra",
+            kind: "problems",
+            stepLabel: "Step 6",
+            surfaceVariant: "mist",
+            title: "Algebra Balance and Logic",
+            hint: "Finish with equations and story problems that ask for a missing value.",
+            layout: "list",
+            problems: shuffle([
+                ...buildAlgebraBalanceProblems(builder, 3),
+                ...takeProblems(buildAlgebraWordProblems(builder), 3)
+            ])
         }
     ];
 

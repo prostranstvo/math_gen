@@ -9,16 +9,37 @@ function countProblems(payload) {
         .reduce((total, section) => total + section.problems.length, 0);
 }
 
-test("generateMathWorksheet builds four problem sections with tracked responses", () => {
+test("generateMathWorksheet builds Swansea-aligned practice sections with tracked responses", () => {
     const payload = generateMathWorksheet();
+    const sectionIds = payload.sections.map((section) => section.id);
+    const prompts = payload.sections.flatMap((section) => section.problems.map((problem) => problem.prompt));
 
     assert.equal(payload.type, "math-practice");
     assert.equal(payload.navLabel, "Practice");
     assert.equal(payload.displayLabel, "Math Practice");
     assert.equal(payload.helperNote.actionLabel, "Check My Page");
-    assert.equal(payload.sections.length, 4);
+    assert.equal(payload.sections.length, 6);
+    assert.deepEqual(
+        sectionIds,
+        [
+            "practice-number-fluency",
+            "practice-measurement",
+            "practice-data",
+            "practice-geometry",
+            "practice-money-probability",
+            "practice-algebra"
+        ]
+    );
     assert(payload.sections.every((section) => section.kind === "problems"));
     assert(payload.sections.every((section) => section.stepLabel && section.surfaceVariant));
+    assert(payload.sections.every((section) => section.problems.length === 6));
+    assert(prompts.some((prompt) => prompt.includes("growing pattern") || prompt.includes("shrinking pattern")));
+    assert(prompts.some((prompt) => prompt.includes("mL") || prompt.includes("kg") || prompt.includes("cm")));
+    assert(prompts.some((prompt) => prompt.includes("mode") || prompt.includes("median") || prompt.includes("range")));
+    assert(prompts.some((prompt) => prompt.includes("angle") || prompt.includes("triangle") || prompt.includes("perimeter") || prompt.includes("area")));
+    assert(prompts.some((prompt) => prompt.includes("$")));
+    assert(prompts.some((prompt) => prompt.includes("probability") || prompt.includes("likely") || prompt.includes("chance")));
+    assert(prompts.some((prompt) => prompt.includes("x") || prompt.includes("missing value")));
 
     const problemCount = countProblems(payload);
     assert.equal(Object.keys(payload.responses.answers).length, problemCount);

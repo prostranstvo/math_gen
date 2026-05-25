@@ -110,6 +110,7 @@ test("new 2026 week topics generate matching weekly math practice", () => {
     const gridWeek = generateFullHomework("20");
     const moneyWeek = generateFullHomework("21");
     const probabilityWeek = generateFullHomework("25");
+    const latestProbabilityWeek = generateFullHomework("26");
 
     const dataPrompts = dataWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const anglePrompts = angleWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
@@ -117,6 +118,7 @@ test("new 2026 week topics generate matching weekly math practice", () => {
     const gridPrompts = gridWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const moneyPrompts = moneyWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const probabilityPrompts = probabilityWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
+    const latestProbabilityPrompts = latestProbabilityWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
 
     assert(dataPrompts.some((prompt) => prompt.includes("mode") || prompt.includes("median")));
     assert(anglePrompts.some((prompt) => prompt.includes("acute") || prompt.includes("obtuse") || prompt.includes("right angle")));
@@ -124,4 +126,5 @@ test("new 2026 week topics generate matching weekly math practice", () => {
     assert(gridPrompts.some((prompt) => prompt.includes("slide") || prompt.includes("turn") || prompt.includes("flip")));
     assert(moneyPrompts.some((prompt) => prompt.includes("$")));
     assert(probabilityPrompts.some((prompt) => prompt.includes("probability") || prompt.includes("likely") || prompt.includes("chance")));
+    assert(latestProbabilityPrompts.some((prompt) => prompt.includes("probability") || prompt.includes("likely") || prompt.includes("chance")));
 });

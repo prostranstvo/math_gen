@@ -446,7 +446,7 @@ function buildProbabilityProblems(builder) {
         builder.problem("A spinner has 4 equal sections and 1 section is green. What is the probability of landing on green?", "1/4", { inputMode: "text" }),
         builder.problem("Write certain, likely, unlikely, or impossible: rolling a 7 on a regular six-sided die.", "impossible", { inputMode: "text" }),
         builder.problem("If 6 out of 10 coin flips landed heads, how many landed tails?", 4),
-        builder.problem("On a probability line from 0 to 1, which is greater: 1/2 or 1/4? Write the greater fraction.", "1/2", { inputMode: "text" }),
+        builder.problem("A board game spinner has 8 equal spaces and 2 spaces make you lose a turn. What is the probability of losing a turn?", "2/8", { inputMode: "text" }),
         builder.problem("A forecast says there is an 8 out of 10 chance of rain. Is rain likely or unlikely?", "likely", { inputMode: "text" })
     ]);
 }

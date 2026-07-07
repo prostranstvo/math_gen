@@ -132,6 +132,7 @@ test("new 2026 week topics generate matching weekly math practice", () => {
     const moneyWeek = generateFullHomework("21");
     const probabilityWeek = generateFullHomework("25");
     const latestProbabilityWeek = generateFullHomework("26");
+    const finalProbabilityWeek = generateFullHomework("27");
 
     const dataPrompts = dataWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const anglePrompts = angleWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
@@ -140,6 +141,7 @@ test("new 2026 week topics generate matching weekly math practice", () => {
     const moneyPrompts = moneyWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const probabilityPrompts = probabilityWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
     const latestProbabilityPrompts = latestProbabilityWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
+    const finalProbabilityPrompts = finalProbabilityWeek.sections.find((section) => section.id === "weekly-math").problems.map((problem) => problem.prompt);
 
     assert(dataPrompts.some((prompt) => prompt.includes("mode") || prompt.includes("median")));
     assert(anglePrompts.some((prompt) => prompt.includes("acute") || prompt.includes("obtuse") || prompt.includes("right angle")));
@@ -148,4 +150,22 @@ test("new 2026 week topics generate matching weekly math practice", () => {
     assert(moneyPrompts.some((prompt) => prompt.includes("$")));
     assert(probabilityPrompts.some((prompt) => prompt.includes("probability") || prompt.includes("likely") || prompt.includes("chance")));
     assert(latestProbabilityPrompts.some((prompt) => prompt.includes("probability") || prompt.includes("likely") || prompt.includes("chance")));
+    assert(finalProbabilityPrompts.some((prompt) => prompt.includes("probability") || prompt.includes("likely") || prompt.includes("chance")));
+});
+
+test("week 27 adds the final qu spelling list to full homework", () => {
+    const payload = generateFullHomework("27");
+    const spellingSection = payload.sections.find((section) => section.id === "spelling");
+    const weeklyMathSection = payload.sections.find((section) => section.id === "weekly-math");
+    const words = spellingSection.practiceRows.map((row) => row.word);
+
+    assert.equal(payload.selectedWeekId, "27");
+    assert.equal(spellingSection.practiceRows.length, 15);
+    assert.deepEqual(words, [
+        "equal", "frequently", "liquid", "equipment", "require",
+        "quickly", "question", "queen", "quietly", "qualify",
+        "squishy", "squirm", "squint", "squirrel", "squirt"
+    ]);
+    assert.equal(weeklyMathSection.title, "Part 2: Weekly Math - Probability Board Game");
+    assert(weeklyMathSection.problems.some((problem) => problem.prompt.includes("probability") || problem.prompt.includes("likely") || problem.prompt.includes("chance")));
 });

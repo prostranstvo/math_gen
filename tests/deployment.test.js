@@ -25,7 +25,7 @@ test("index.html includes share-preview metadata and icon assets", async () => {
     assert(html.includes('rel="apple-touch-icon" href="./assets/favicon.png"'));
     assert(html.includes('property="og:image" content="https://prostranstvo.github.io/math_gen/assets/share-preview.png"'));
     assert(html.includes('name="twitter:card" content="summary_large_image"'));
-    assert(html.includes('property="og:title" content="Math Gen | Pick today\'s sheet"'));
+    assert(html.includes('property="og:title" content="Math Gen | Grade 6 learning"'));
 });
 
 test(".nojekyll is present at the project root", async () => {

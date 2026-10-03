@@ -1,3 +1,7 @@
 .DS_Store
 progress.md
 data/swansea-weeks.import.json
+
+# Local browser checks
+.playwright-cli/
+output/playwright/

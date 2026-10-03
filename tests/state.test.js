@@ -174,3 +174,18 @@ test("recordCompletion uses trophyPoints for perfect spelling rounds", () => {
     assert.equal(shelf.stats.completedTests, 1);
     assert.equal(shelf.stats.perfectSpellingRounds, 1);
 });
+
+test("blocked browser storage does not stop the portal from opening", () => {
+    const originalWindow = globalThis.window;
+    globalThis.window = Object.defineProperties({}, {
+        localStorage: { get() { throw new Error("Storage blocked"); } },
+        sessionStorage: { get() { throw new Error("Storage blocked"); } }
+    });
+    try {
+        assert.doesNotThrow(() => getProgressShelf());
+        assert.equal(restoreActiveWorksheet(), null);
+    } finally {
+        if (originalWindow === undefined) delete globalThis.window;
+        else globalThis.window = originalWindow;
+    }
+});

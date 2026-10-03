@@ -1,3 +1,4 @@
+import { createGrade6Portal } from "./grade6.js";
 import { homeContent } from "../data/home-content.js";
 import { swanseaWeeks, weekOrder } from "../data/swansea-weeks.js";
 import { generateFullHomework, generateMathWorksheet, generateSpellingTestGame, getDefaultWeekId } from "./generator.js";
@@ -18,7 +19,7 @@ import {
 const app = document.getElementById("app");
 
 const uiState = {
-    view: "home",
+    view: "grade6",
     selectedWeekId: getDefaultWeekId(),
     activeWorksheet: null,
     validation: null,
@@ -27,6 +28,18 @@ const uiState = {
     pendingFocus: null,
     liveAnswerFeedback: {}
 };
+
+const grade6Portal = createGrade6Portal({
+    onRender: renderApp,
+    onArchive: () => {
+        uiState.view = "home";
+        renderApp();
+        const heading = document.querySelector(".hero-title");
+        heading?.setAttribute("tabindex", "-1");
+        heading?.focus();
+        window.scrollTo({ top: 0, behavior: "instant" });
+    }
+});
 
 let gameTimerId = null;
 let preferredSpeechVoice = null;
@@ -147,12 +160,14 @@ function syncGameDebugHooks() {
 }
 
 function renderApp() {
-    const progress = getProgressShelf();
+    const progress = uiState.view === "grade6" ? null : getProgressShelf();
     let markup = "";
 
     clearGameTimer();
 
-    if (uiState.view === "worksheet" && uiState.activeWorksheet) {
+    if (uiState.view === "grade6") {
+        markup = grade6Portal.render();
+    } else if (uiState.view === "worksheet" && uiState.activeWorksheet) {
         markup = renderWorksheetView({
             payload: uiState.activeWorksheet,
             validation: uiState.validation,
@@ -182,7 +197,9 @@ function renderApp() {
     }
 
     app.dataset.view = uiState.view;
-    app.innerHTML = markup;
+    if (uiState.view === "grade6") app.removeAttribute("aria-live");
+    else app.setAttribute("aria-live", "polite");
+    app.innerHTML = uiState.view === "grade6" ? markup : `<div class="g6-archive-bar no-print"><span>Grade 5 archive · Homework, practice, and saved work</span><button type="button" class="g6-button g6-button--secondary" data-action="open-grade6">Return to Grade 6 →</button></div>${markup}`;
     applyPendingFocus();
     syncGameDebugHooks();
     applyGamePhaseEffect();
@@ -527,6 +544,11 @@ function findCompletionRecord(recordId) {
 
 function handleAction(action, target = null) {
     switch (action) {
+        case "open-grade6":
+            uiState.view = "grade6";
+            renderApp();
+            document.getElementById("g6-heading")?.focus();
+            break;
         case "generate-math":
             openWorksheet(generateMathWorksheet());
             break;
@@ -620,6 +642,7 @@ function handleAction(action, target = null) {
 }
 
 function handleClick(event) {
+    if (uiState.view === "grade6") { grade6Portal.click(event); return; }
     const speakTarget = event.target.closest("[data-speak-text]");
     if (speakTarget) {
         speakText(speakTarget.dataset.speakText, { force: true });
@@ -652,6 +675,7 @@ function handleFocusIn(event) {
 }
 
 function handleInput(event) {
+    if (uiState.view === "grade6") { grade6Portal.input(event); return; }
     if (!uiState.activeWorksheet) {
         return;
     }
@@ -685,6 +709,7 @@ function handleInput(event) {
 }
 
 function handleChange(event) {
+    if (uiState.view === "grade6") { grade6Portal.change(event); return; }
     const target = event.target;
 
     if (target.id === "week-selector") {
@@ -708,6 +733,7 @@ function handleChange(event) {
 }
 
 function handleSubmit(event) {
+    if (uiState.view === "grade6") { grade6Portal.submit(event); return; }
     const form = event.target.closest("[data-game-form]");
     if (!form) {
         return;
@@ -723,7 +749,6 @@ function boot() {
 
     if (uiState.activeWorksheet) {
         uiState.selectedWeekId = uiState.activeWorksheet.selectedWeekId || uiState.selectedWeekId;
-        uiState.view = uiState.activeWorksheet.type === "spelling-test" ? "game" : "worksheet";
     }
 
     app.addEventListener("click", handleClick);

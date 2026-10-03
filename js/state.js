@@ -96,7 +96,7 @@ function getLocalStorage() {
         return null;
     }
 
-    return window.localStorage;
+    try { return window.localStorage; } catch { return null; }
 }
 
 function getSessionStorage() {
@@ -104,7 +104,7 @@ function getSessionStorage() {
         return null;
     }
 
-    return window.sessionStorage;
+    try { return window.sessionStorage; } catch { return null; }
 }
 
 function readJson(storage, key, fallbackValue) {
